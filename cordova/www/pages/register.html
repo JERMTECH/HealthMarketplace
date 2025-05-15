@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; connect-src *">
+    <title>Register - MediMarket Mobile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .register-container {
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .register-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .form-floating {
+            margin-bottom: 15px;
+        }
+        
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 100;
+            background: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .account-type-selector {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .account-type {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            border-radius: 10px;
+            margin: 0 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .account-type.active {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+        
+        .account-type i {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back Button -->
+    <a href="../index.html" class="btn-back">
+        <i data-feather="arrow-left"></i>
+    </a>
+    
+    <div class="container register-container">
+        <div class="logo-container">
+            <h1><span class="text-primary">Medi</span><span class="text-success">Market</span></h1>
+            <p class="text-muted">Create your account</p>
+        </div>
+        
+        <div class="register-card">
+            <!-- Account Type Selection -->
+            <div class="account-type-selector">
+                <div class="account-type active" data-type="patient" id="patient-selector">
+                    <i data-feather="user" class="text-primary"></i>
+                    <p class="mb-0">Patient</p>
+                </div>
+                <div class="account-type" data-type="clinic" id="clinic-selector">
+                    <i data-feather="briefcase" class="text-primary"></i>
+                    <p class="mb-0">Healthcare Provider</p>
+                </div>
+            </div>
+            
+            <form id="register-form">
+                <input type="hidden" id="user-type" value="patient">
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="name" placeholder="Full Name" required>
+                    <label for="name">Full Name</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="email" placeholder="Email address" required>
+                    <label for="email">Email address</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="password" placeholder="Password" required>
+                    <label for="password">Password</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="confirm-password" placeholder="Confirm password" required>
+                    <label for="confirm-password">Confirm password</label>
+                </div>
+                
+                <!-- Clinic-specific fields (hidden by default) -->
+                <div id="clinic-fields" style="display: none;">
+                    <div class="form-floating mt-3">
+                        <input type="text" class="form-control" id="specialization" placeholder="Specialization">
+                        <label for="specialization">Specialization</label>
+                    </div>
+                    
+                    <div class="form-floating mt-3">
+                        <input type="text" class="form-control" id="address" placeholder="Address">
+                        <label for="address">Address</label>
+                    </div>
+                    
+                    <div class="form-floating mt-3">
+                        <input type="tel" class="form-control" id="phone" placeholder="Phone Number">
+                        <label for="phone">Phone Number</label>
+                    </div>
+                </div>
+                
+                <!-- Patient-specific fields -->
+                <div id="patient-fields">
+                    <div class="form-floating mt-3">
+                        <input type="date" class="form-control" id="date-of-birth" placeholder="Date of Birth">
+                        <label for="date-of-birth">Date of Birth</label>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                </div>
+                
+                <div class="alert alert-danger mt-3" id="error-message" style="display: none;"></div>
+            </form>
+        </div>
+        
+        <div class="text-center">
+            <p>Already have an account? <a href="login.html" class="link-primary">Login</a></p>
+        </div>
+    </div>
+    
+    <!-- Loading spinner -->
+    <div class="spinner-container" id="spinner" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Cordova Scripts -->
+    <script src="../cordova.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+            
+            // Get URL parameters to see if a specific account type was requested
+            const params = new URLSearchParams(window.location.search);
+            const typeFromUrl = params.get('type');
+            
+            if (typeFromUrl === 'clinic') {
+                switchAccountType('clinic');
+            }
+            
+            // Handle account type selection
+            const patientSelector = document.getElementById('patient-selector');
+            const clinicSelector = document.getElementById('clinic-selector');
+            const userTypeField = document.getElementById('user-type');
+            const clinicFields = document.getElementById('clinic-fields');
+            const patientFields = document.getElementById('patient-fields');
+            
+            patientSelector.addEventListener('click', function() {
+                switchAccountType('patient');
+            });
+            
+            clinicSelector.addEventListener('click', function() {
+                switchAccountType('clinic');
+            });
+            
+            function switchAccountType(type) {
+                userTypeField.value = type;
+                
+                if (type === 'patient') {
+                    patientSelector.classList.add('active');
+                    clinicSelector.classList.remove('active');
+                    clinicFields.style.display = 'none';
+                    patientFields.style.display = 'block';
+                } else {
+                    clinicSelector.classList.add('active');
+                    patientSelector.classList.remove('active');
+                    clinicFields.style.display = 'block';
+                    patientFields.style.display = 'none';
+                }
+            }
+            
+            // Handle form submission
+            const registerForm = document.getElementById('register-form');
+            const errorMessage = document.getElementById('error-message');
+            const spinner = document.getElementById('spinner');
+            
+            registerForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Validate form
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                if (password !== confirmPassword) {
+                    errorMessage.textContent = 'Passwords do not match';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+                
+                // Hide any previous error messages
+                errorMessage.style.display = 'none';
+                
+                // Show loading spinner
+                spinner.style.display = 'flex';
+                
+                // Create user data object
+                const userData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    password: password,
+                    type: userTypeField.value
+                };
+                
+                // Add type-specific fields
+                if (userData.type === 'clinic') {
+                    userData.clinic = {
+                        specialization: document.getElementById('specialization').value,
+                        address: document.getElementById('address').value,
+                        phone: document.getElementById('phone').value
+                    };
+                } else {
+                    userData.patient = {
+                        date_of_birth: document.getElementById('date-of-birth').value
+                    };
+                }
+                
+                // Register user using API client
+                MediMarketAPI.Auth.register(userData)
+                    .then(response => {
+                        // Redirect to login page with success message
+                        window.location.href = 'login.html?registered=true';
+                    })
+                    .catch(error => {
+                        console.error('Registration error:', error);
+                        
+                        // Hide spinner
+                        spinner.style.display = 'none';
+                        
+                        // Show error message
+                        errorMessage.textContent = error.message || 'Error creating account. Please try again.';
+                        errorMessage.style.display = 'block';
+                    });
+            });
+        });
+        
+        // Handle Cordova device ready event
+        document.addEventListener('deviceready', onDeviceReady, false);
+        
+        function onDeviceReady() {
+            console.log('Cordova is ready on register page!');
+            
+            // Setup status bar (iOS)
+            if (window.StatusBar) {
+                StatusBar.styleDefault();
+            }
+        }
+    </script>
+</body>
+</html>

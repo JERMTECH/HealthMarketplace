@@ -196,7 +196,8 @@
     <script src="cordova.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script>
+    <script src="js/api.js"></script>
+    <script
         document.addEventListener('DOMContentLoaded', function() {
             feather.replace();
         });
@@ -252,87 +253,68 @@
                 return;
             }
             
-            // Make API call to check auth status
-            fetch('/api/auth/check', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    // Token invalid
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userType');
-                    throw new Error('Authentication failed');
-                }
-            })
-            .then(data => {
-                // Update UI based on auth status
-                console.log('Auth check success:', data);
-                localStorage.setItem('userType', data.type);
-                localStorage.setItem('userId', data.id);
-            })
-            .catch(error => {
-                console.error('Auth check error:', error);
-            });
+            // Use our API client to check auth status
+            MediMarketAPI.Auth.checkStatus()
+                .then(data => {
+                    // Update UI based on auth status
+                    console.log('Auth check success:', data);
+                    localStorage.setItem('userType', data.type);
+                    localStorage.setItem('userId', data.id);
+                })
+                .catch(error => {
+                    console.error('Auth check error:', error);
+                    // Token invalid errors are automatically handled in the API client
+                });
         }
         
         function loadFeaturedClinics() {
-            fetch('/api/clinics/featured')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to load featured clinics');
-                }
-                return response.json();
-            })
-            .then(clinics => {
-                const container = document.getElementById('featured-clinics');
-                container.innerHTML = '';
-                
-                if (clinics.length === 0) {
+            MediMarketAPI.Clinics.getFeaturedClinics()
+                .then(clinics => {
+                    const container = document.getElementById('featured-clinics');
+                    container.innerHTML = '';
+                    
+                    if (clinics.length === 0) {
+                        container.innerHTML = `
+                            <div class="col-12 text-center">
+                                <p>No featured clinics available at the moment.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    clinics.forEach(clinic => {
+                        const card = document.createElement('div');
+                        card.className = 'col-12 mb-3';
+                        card.innerHTML = `
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">${clinic.name}</h5>
+                                    <p class="card-text small">
+                                        ${clinic.specialization || 'General Healthcare'}
+                                    </p>
+                                    <p class="card-text small">
+                                        <i data-feather="map-pin" class="feather-small"></i> 
+                                        ${clinic.location || clinic.address || 'Location not specified'}
+                                    </p>
+                                    <a href="pages/appointments.html?clinic=${clinic.id}" class="btn btn-sm btn-primary">Book Appointment</a>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                    
+                    // Re-run feather icons
+                    feather.replace();
+                })
+                .catch(error => {
+                    console.error('Error loading featured clinics:', error);
+                    const container = document.getElementById('featured-clinics');
                     container.innerHTML = `
                         <div class="col-12 text-center">
-                            <p>No featured clinics available at the moment.</p>
+                            <p>Error loading clinics. Please try again later.</p>
                         </div>
                     `;
-                    return;
-                }
-                
-                clinics.forEach(clinic => {
-                    const card = document.createElement('div');
-                    card.className = 'col-12 mb-3';
-                    card.innerHTML = `
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">${clinic.name}</h5>
-                                <p class="card-text small">
-                                    ${clinic.specialization || 'General Healthcare'}
-                                </p>
-                                <p class="card-text small">
-                                    <i data-feather="map-pin" class="feather-small"></i> 
-                                    ${clinic.location || clinic.address || 'Location not specified'}
-                                </p>
-                                <a href="pages/appointments.html?clinic=${clinic.id}" class="btn btn-sm btn-primary">Book Appointment</a>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(card);
                 });
-                
-                // Re-run feather icons
-                feather.replace();
-            })
-            .catch(error => {
-                console.error('Error loading featured clinics:', error);
-                const container = document.getElementById('featured-clinics');
-                container.innerHTML = `
-                    <div class="col-12 text-center">
-                        <p>Error loading clinics. Please try again later.</p>
-                    </div>
-                `;
-            });
         }
     </script>
 </body>
