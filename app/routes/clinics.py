@@ -1,0 +1,158 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List
+import uuid
+
+from app.database import get_db
+from app.models.users import User
+from app.models.clinics import Clinic, ClinicService
+from app.schemas.clinic import (
+    ClinicResponse,
+    ClinicUpdate,
+    ClinicServiceCreate,
+    ClinicServiceResponse,
+    ClinicServiceUpdate
+)
+from app.auth import get_current_active_user
+
+router = APIRouter()
+
+# Get all clinics
+@router.get("/", response_model=List[ClinicResponse])
+async def get_clinics(db: Session = Depends(get_db)):
+    clinics = db.query(Clinic).all()
+    return clinics
+
+# Get featured clinics (for homepage)
+@router.get("/featured", response_model=List[ClinicResponse])
+async def get_featured_clinics(db: Session = Depends(get_db)):
+    # In a real app, this might use criteria like ratings, etc.
+    # For now, just return the first 3 clinics
+    clinics = db.query(Clinic).limit(3).all()
+    return clinics
+
+# Get a specific clinic
+@router.get("/{clinic_id}", response_model=ClinicResponse)
+async def get_clinic(clinic_id: str, db: Session = Depends(get_db)):
+    clinic = db.query(Clinic).filter(Clinic.id == clinic_id).first()
+    if not clinic:
+        raise HTTPException(status_code=404, detail="Clinic not found")
+    return clinic
+
+# Update clinic
+@router.put("/{clinic_id}", response_model=ClinicResponse)
+async def update_clinic(
+    clinic_id: str,
+    clinic_data: ClinicUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if user is authorized
+    if current_user.id != clinic_id or current_user.type != "clinic":
+        raise HTTPException(status_code=403, detail="Not authorized to update this clinic")
+    
+    clinic = db.query(Clinic).filter(Clinic.id == clinic_id).first()
+    if not clinic:
+        raise HTTPException(status_code=404, detail="Clinic not found")
+    
+    # Update clinic
+    for key, value in clinic_data.dict(exclude_unset=True).items():
+        setattr(clinic, key, value)
+    
+    # Update user name if it changed
+    if clinic_data.name:
+        user = db.query(User).filter(User.id == clinic_id).first()
+        if user:
+            user.name = clinic_data.name
+    
+    db.commit()
+    db.refresh(clinic)
+    
+    return clinic
+
+# Get clinic services
+@router.get("/{clinic_id}/services", response_model=List[ClinicServiceResponse])
+async def get_clinic_services(clinic_id: str, db: Session = Depends(get_db)):
+    clinic = db.query(Clinic).filter(Clinic.id == clinic_id).first()
+    if not clinic:
+        raise HTTPException(status_code=404, detail="Clinic not found")
+    
+    services = db.query(ClinicService).filter(ClinicService.clinic_id == clinic_id).all()
+    return services
+
+# Add a clinic service
+@router.post("/services", response_model=ClinicServiceResponse)
+async def add_clinic_service(
+    service_data: ClinicServiceCreate,
+    clinic_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if user is authorized
+    if current_user.id != clinic_id or current_user.type != "clinic":
+        raise HTTPException(status_code=403, detail="Not authorized to add services for this clinic")
+    
+    # Create service
+    service = ClinicService(
+        id=str(uuid.uuid4()),
+        clinic_id=clinic_id,
+        name=service_data.name,
+        description=service_data.description,
+        price=service_data.price,
+        duration=service_data.duration,
+        available=service_data.available
+    )
+    
+    db.add(service)
+    db.commit()
+    db.refresh(service)
+    
+    return service
+
+# Update a clinic service
+@router.put("/services/{service_id}", response_model=ClinicServiceResponse)
+async def update_clinic_service(
+    service_id: str,
+    service_data: ClinicServiceUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Get service
+    service = db.query(ClinicService).filter(ClinicService.id == service_id).first()
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Check if user is authorized
+    if current_user.id != service.clinic_id or current_user.type != "clinic":
+        raise HTTPException(status_code=403, detail="Not authorized to update this service")
+    
+    # Update service
+    for key, value in service_data.dict(exclude_unset=True).items():
+        setattr(service, key, value)
+    
+    db.commit()
+    db.refresh(service)
+    
+    return service
+
+# Delete a clinic service
+@router.delete("/services/{service_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_clinic_service(
+    service_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Get service
+    service = db.query(ClinicService).filter(ClinicService.id == service_id).first()
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Check if user is authorized
+    if current_user.id != service.clinic_id or current_user.type != "clinic":
+        raise HTTPException(status_code=403, detail="Not authorized to delete this service")
+    
+    # Delete service
+    db.delete(service)
+    db.commit()
+    
+    return None

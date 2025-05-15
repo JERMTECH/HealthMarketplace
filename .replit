@@ -1,7 +1,8 @@
-modules = ["nodejs-20"]
+modules = ["nodejs-20", "python-3.11"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["libxcrypt"]
 
 [workflows]
 runButton = "Project"
@@ -21,7 +22,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm install express cors morgan bcryptjs uuid jsonwebtoken && node server.js"
+args = "python main.py"
 waitForPort = 5000
 
 [deployment]
