@@ -37,15 +37,15 @@ async def get_rewards_info(db: Session = Depends(get_db)):
         }
         shops_with_categories.append(shop_dict)
     
-    # Return rewards info
+    # Return rewards info with camelCase for frontend compatibility
     return {
-        "earn_rates": {
+        "earnRates": {
             "products": 10,  # points per $1
             "services": 5,   # points per $1
             "referral": 500  # flat points for referral
         },
-        "redemption_rate": 100,  # 100 points = $1
-        "partner_shops": shops_with_categories
+        "redemptionRate": 100,  # 100 points = $1
+        "partnerShops": shops_with_categories
     }
 
 # Get patient rewards
@@ -96,7 +96,7 @@ async def get_patient_rewards(
     card = db.query(RewardCard).filter(RewardCard.patient_id == patient_id).first()
     
     return {
-        "total_points": total_points,
+        "totalPoints": total_points,
         "history": history,
         "card": card
     }

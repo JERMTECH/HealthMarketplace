@@ -44,6 +44,7 @@ def get_db():
     retry_count = 0
     
     while retry_count < max_retries:
+        db = None
         try:
             db = SessionLocal()
             # Test connection
@@ -52,18 +53,25 @@ def get_db():
             try:
                 yield db
             finally:
-                db.close()
+                if db:
+                    logger.debug("Closing database connection")
+                    db.close()
             return
         except OperationalError as e:
             retry_count += 1
             logger.warning(f"Database connection error (attempt {retry_count}/{max_retries}): {e}")
             # Close potentially stale connection
-            if 'db' in locals():
-                db.close()
+            if db:
+                try:
+                    db.close()
+                except Exception as close_error:
+                    logger.error(f"Error closing database connection: {close_error}")
             
             if retry_count < max_retries:
                 # Wait before retrying (exponential backoff)
-                time.sleep(0.5 * (2 ** retry_count))
+                backoff_time = 0.5 * (2 ** retry_count)
+                logger.info(f"Retrying database connection in {backoff_time} seconds")
+                time.sleep(backoff_time)
             else:
                 logger.error("Failed to connect to database after multiple attempts")
                 raise
