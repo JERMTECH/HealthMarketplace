@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
+import datetime
 
 from app.database import engine, Base
 from app.auth import get_current_user
@@ -38,9 +39,6 @@ app.include_router(products.router, prefix="/api/products", tags=["Products"])
 app.include_router(prescriptions_router, prefix="/api/prescriptions", tags=["Prescriptions"])
 app.include_router(rewards_router, prefix="/api/rewards", tags=["Rewards"])
 
-# Mount static files
-app.mount("/", StaticFiles(directory="public", html=True), name="static")
-
 # Create sample data
 @app.on_event("startup")
 async def startup_event():
@@ -48,7 +46,24 @@ async def startup_event():
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "ok"}
+    """Health check endpoint returning system status."""
+    return {
+        "status": "ok",
+        "version": "1.0.0",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "endpoints": {
+            "auth": "/api/auth",
+            "clinics": "/api/clinics",
+            "patients": "/api/patients",
+            "appointments": "/api/appointments",
+            "products": "/api/products",
+            "prescriptions": "/api/prescriptions",
+            "rewards": "/api/rewards"
+        }
+    }
+
+# Mount static files - IMPORTANT: This must be the last route to be added
+app.mount("/", StaticFiles(directory="public", html=True), name="static")
 
 if __name__ == "__main__":
     # Get port from environment variable or use default
