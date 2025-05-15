@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; connect-src *">
+    <title>Login - MediMarket Mobile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .login-container {
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .login-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-floating {
+            margin-bottom: 20px;
+        }
+        
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 100;
+            background: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Back Button -->
+    <a href="../index.html" class="btn-back">
+        <i data-feather="arrow-left"></i>
+    </a>
+    
+    <div class="container login-container">
+        <div class="logo-container">
+            <h1><span class="text-primary">Medi</span><span class="text-success">Market</span></h1>
+            <p class="text-muted">Sign in to your account</p>
+        </div>
+        
+        <div class="login-card">
+            <form id="login-form">
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="email" placeholder="Email address" required>
+                    <label for="email">Email address</label>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="password" placeholder="Password" required>
+                    <label for="password">Password</label>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                </div>
+                
+                <div class="alert alert-danger mt-3" id="error-message" style="display: none;"></div>
+            </form>
+        </div>
+        
+        <div class="text-center">
+            <p>Don't have an account? <a href="register.html" class="link-primary">Register</a></p>
+        </div>
+    </div>
+    
+    <!-- Loading spinner -->
+    <div class="spinner-container" id="spinner" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Cordova Scripts -->
+    <script src="../cordova.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+            
+            // Handle login form submission
+            const loginForm = document.getElementById('login-form');
+            const errorMessage = document.getElementById('error-message');
+            const spinner = document.getElementById('spinner');
+            
+            loginForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Hide any previous error messages
+                errorMessage.style.display = 'none';
+                
+                // Show loading spinner
+                spinner.style.display = 'flex';
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Make API call to login
+                fetch('/api/auth/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Login failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Store token in localStorage
+                    localStorage.setItem('token', data.access_token);
+                    
+                    // Get user details
+                    return fetch('/api/auth/check', {
+                        headers: {
+                            'Authorization': `Bearer ${data.access_token}`
+                        }
+                    });
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to get user details');
+                    }
+                    return response.json();
+                })
+                .then(userData => {
+                    // Store user type and redirect
+                    localStorage.setItem('userType', userData.type);
+                    localStorage.setItem('userId', userData.id);
+                    
+                    // Redirect based on user type
+                    if (userData.type === 'clinic') {
+                        window.location.href = 'clinic-dashboard.html';
+                    } else {
+                        window.location.href = 'patient-dashboard.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    
+                    // Hide spinner
+                    spinner.style.display = 'none';
+                    
+                    // Show error message
+                    errorMessage.textContent = 'Invalid email or password. Please try again.';
+                    errorMessage.style.display = 'block';
+                });
+            });
+        });
+        
+        // Handle Cordova device ready event
+        document.addEventListener('deviceready', onDeviceReady, false);
+        
+        function onDeviceReady() {
+            console.log('Cordova is ready on login page!');
+            
+            // Setup status bar (iOS)
+            if (window.StatusBar) {
+                StatusBar.styleDefault();
+            }
+        }
+    </script>
+</body>
+</html>
