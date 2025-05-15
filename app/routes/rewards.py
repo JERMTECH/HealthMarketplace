@@ -172,3 +172,29 @@ def generate_card_number():
         if (i + 1) % 4 == 0 and i < 15:
             card_number += "-"
     return card_number
+            
+# Get partner shops for rewards
+@router.get("/partners", response_model=List[PartnerShopResponse])
+async def get_partner_shops(db: Session = Depends(get_db)):
+    """Get all partner shops where reward points can be redeemed."""
+    partner_shops = db.query(PartnerShop).all()
+    
+    # For each partner shop, get categories
+    result = []
+    for shop in partner_shops:
+        categories = db.query(PartnerShopCategory).filter(
+            PartnerShopCategory.partner_shop_id == shop.id
+        ).all()
+        
+        shop_data = {
+            "id": shop.id,
+            "name": shop.name,
+            "description": shop.description,
+            "location": shop.location,
+            "website": shop.website,
+            "logo_url": shop.logo_url,
+            "categories": [{"id": cat.id, "name": cat.name} for cat in categories]
+        }
+        result.append(shop_data)
+    
+    return result

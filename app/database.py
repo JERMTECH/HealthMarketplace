@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
@@ -47,7 +47,7 @@ def get_db():
         try:
             db = SessionLocal()
             # Test connection
-            db.execute("SELECT 1")
+            db.execute(text("SELECT 1"))
             logger.debug("Database connection successful")
             try:
                 yield db

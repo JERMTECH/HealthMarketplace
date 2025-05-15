@@ -88,3 +88,16 @@ async def login_for_access_token(
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
+
+@router.get("/check")
+async def check_auth_status(current_user: User = Depends(get_current_active_user)):
+    """Check if the user is authenticated and return user data."""
+    return {
+        "authenticated": True,
+        "user": {
+            "id": current_user.id,
+            "name": current_user.name,
+            "email": current_user.email,
+            "type": current_user.type
+        }
+    }
