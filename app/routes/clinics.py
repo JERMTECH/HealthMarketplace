@@ -21,7 +21,21 @@ router = APIRouter()
 @router.get("/", response_model=List[ClinicResponse])
 async def get_clinics(db: Session = Depends(get_db)):
     clinics = db.query(Clinic).all()
-    return clinics
+    result = []
+    
+    for clinic in clinics:
+        # Get the corresponding user to get email and name
+        user = db.query(User).filter(User.id == clinic.id).first()
+        if user:
+            clinic_data = {
+                **clinic.__dict__,
+                "name": user.name,
+                "email": user.email,
+                "services": clinic.services
+            }
+            result.append(clinic_data)
+    
+    return result
 
 # Get featured clinics (for homepage)
 @router.get("/featured", response_model=List[ClinicResponse])
@@ -29,7 +43,21 @@ async def get_featured_clinics(db: Session = Depends(get_db)):
     # In a real app, this might use criteria like ratings, etc.
     # For now, just return the first 3 clinics
     clinics = db.query(Clinic).limit(3).all()
-    return clinics
+    result = []
+    
+    for clinic in clinics:
+        # Get the corresponding user to get email and name
+        user = db.query(User).filter(User.id == clinic.id).first()
+        if user:
+            clinic_data = {
+                **clinic.__dict__,
+                "name": user.name,
+                "email": user.email,
+                "services": clinic.services
+            }
+            result.append(clinic_data)
+    
+    return result
 
 # Get a specific clinic
 @router.get("/{clinic_id}", response_model=ClinicResponse)
@@ -37,7 +65,20 @@ async def get_clinic(clinic_id: str, db: Session = Depends(get_db)):
     clinic = db.query(Clinic).filter(Clinic.id == clinic_id).first()
     if not clinic:
         raise HTTPException(status_code=404, detail="Clinic not found")
-    return clinic
+    
+    # Get the corresponding user to get email and name
+    user = db.query(User).filter(User.id == clinic.id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Clinic user not found")
+    
+    clinic_data = {
+        **clinic.__dict__,
+        "name": user.name,
+        "email": user.email,
+        "services": clinic.services
+    }
+    
+    return clinic_data
 
 # Update clinic
 @router.put("/{clinic_id}", response_model=ClinicResponse)
@@ -56,19 +97,33 @@ async def update_clinic(
         raise HTTPException(status_code=404, detail="Clinic not found")
     
     # Update clinic
-    for key, value in clinic_data.dict(exclude_unset=True).items():
+    update_data = {k: v for k, v in clinic_data.dict(exclude_unset=True).items() 
+                 if k not in ["name"]}
+    for key, value in update_data.items():
         setattr(clinic, key, value)
     
     # Update user name if it changed
-    if clinic_data.name:
-        user = db.query(User).filter(User.id == clinic_id).first()
-        if user:
-            user.name = clinic_data.name
+    user = db.query(User).filter(User.id == clinic_id).first()
+    if clinic_data.name and user:
+        # Update directly in database
+        db.query(User).filter(User.id == clinic_id).update({"name": clinic_data.name})
     
     db.commit()
     db.refresh(clinic)
     
-    return clinic
+    # Create response with both user and clinic data
+    user = db.query(User).filter(User.id == clinic_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Clinic user not found")
+    
+    clinic_data = {
+        **clinic.__dict__,
+        "name": user.name,
+        "email": user.email,
+        "services": clinic.services
+    }
+    
+    return clinic_data
 
 # Get clinic services
 @router.get("/{clinic_id}/services", response_model=List[ClinicServiceResponse])
