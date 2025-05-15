@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MediMarket</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="text-primary">Medi</span><span class="text-success">Market</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/appointments.html">Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/products.html">Products</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4" id="register-title">Register</h2>
+                        
+                        <ul class="nav nav-pills mb-4 justify-content-center" id="registerTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="patient-tab" data-bs-toggle="pill" data-bs-target="#patient-form" type="button" role="tab" aria-controls="patient-form" aria-selected="true">Patient</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="clinic-tab" data-bs-toggle="pill" data-bs-target="#clinic-form" type="button" role="tab" aria-controls="clinic-form" aria-selected="false">Healthcare Provider</button>
+                            </li>
+                        </ul>
+                        
+                        <div id="error-message" class="alert alert-danger" style="display: none;" role="alert"></div>
+                        <div id="success-message" class="alert alert-success" style="display: none;" role="alert"></div>
+                        
+                        <div class="tab-content" id="registerTabContent">
+                            <!-- Patient Registration Form -->
+                            <div class="tab-pane fade show active" id="patient-form" role="tabpanel" aria-labelledby="patient-tab">
+                                <form id="patient-register-form">
+                                    <input type="hidden" name="type" value="patient">
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="patient-name" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="patient-name" name="name" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="patient-email" class="form-label">Email address</label>
+                                            <input type="email" class="form-control" id="patient-email" name="email" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="patient-password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="patient-password" name="password" required minlength="6">
+                                            <div class="form-text">Password must be at least 6 characters long.</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="patient-confirm-password" class="form-label">Confirm Password</label>
+                                            <input type="password" class="form-control" id="patient-confirm-password" name="confirmPassword" required minlength="6">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="patient-phone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="patient-phone" name="phone">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="patient-address" class="form-label">Address</label>
+                                            <input type="text" class="form-control" id="patient-address" name="address">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="patient-terms" required>
+                                        <label class="form-check-label" for="patient-terms">I agree to the terms and conditions</label>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary" id="patient-register-btn">Register as Patient</button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Clinic Registration Form -->
+                            <div class="tab-pane fade" id="clinic-form" role="tabpanel" aria-labelledby="clinic-tab">
+                                <form id="clinic-register-form">
+                                    <input type="hidden" name="type" value="clinic">
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clinic-name" class="form-label">Clinic/Hospital Name</label>
+                                            <input type="text" class="form-control" id="clinic-name" name="name" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clinic-email" class="form-label">Email address</label>
+                                            <input type="email" class="form-control" id="clinic-email" name="email" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clinic-password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="clinic-password" name="password" required minlength="6">
+                                            <div class="form-text">Password must be at least 6 characters long.</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clinic-confirm-password" class="form-label">Confirm Password</label>
+                                            <input type="password" class="form-control" id="clinic-confirm-password" name="confirmPassword" required minlength="6">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clinic-phone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="clinic-phone" name="phone" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clinic-address" class="form-label">Address</label>
+                                            <input type="text" class="form-control" id="clinic-address" name="address" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="clinic-specialization" class="form-label">Specialization</label>
+                                        <input type="text" class="form-control" id="clinic-specialization" name="specialization" placeholder="e.g., General Practice, Cardiology, Pediatrics">
+                                    </div>
+                                    
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="clinic-terms" required>
+                                        <label class="form-check-label" for="clinic-terms">I agree to the terms and conditions</label>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary" id="clinic-register-btn">Register as Healthcare Provider</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <p>Already have an account? <a href="/pages/login.html">Login</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><span class="text-primary">Medi</span><span class="text-success">Market</span></h5>
+                    <p>Your comprehensive healthcare marketplace platform.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white">Home</a></li>
+                        <li><a href="/pages/appointments.html" class="text-white">Appointments</a></li>
+                        <li><a href="/pages/products.html" class="text-white">Products</a></li>
+                        <li><a href="/pages/rewards.html" class="text-white">Rewards</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>For Clinics</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/pages/register.html?type=clinic" class="text-white">Register</a></li>
+                        <li><a href="/pages/login.html" class="text-white">Login</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="mailto:support@medimarket.com" class="text-white">Email Us</a></li>
+                        <li><a href="tel:+1234567890" class="text-white">Call Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2023 MediMarket. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        feather.replace();
+        
+        // Set active tab based on URL parameter
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            
+            if (type === 'clinic') {
+                document.getElementById('clinic-tab').click();
+            }
+        });
+        
+        // Patient registration form submission
+        document.getElementById('patient-register-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('patient-name').value;
+            const email = document.getElementById('patient-email').value;
+            const password = document.getElementById('patient-password').value;
+            const confirmPassword = document.getElementById('patient-confirm-password').value;
+            const phone = document.getElementById('patient-phone').value;
+            const address = document.getElementById('patient-address').value;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            const registerBtn = document.getElementById('patient-register-btn');
+            setLoading(registerBtn.id, true);
+            
+            try {
+                const userData = {
+                    type: 'patient',
+                    name,
+                    email,
+                    password,
+                    phone,
+                    address
+                };
+                
+                const user = await register(userData);
+                
+                // Show success message
+                showSuccess('Registration successful! Redirecting to your dashboard...');
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = '/pages/patient-dashboard.html';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showError(error.message || 'Registration failed. Please try again.');
+            } finally {
+                setLoading(registerBtn.id, false);
+            }
+        });
+        
+        // Clinic registration form submission
+        document.getElementById('clinic-register-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('clinic-name').value;
+            const email = document.getElementById('clinic-email').value;
+            const password = document.getElementById('clinic-password').value;
+            const confirmPassword = document.getElementById('clinic-confirm-password').value;
+            const phone = document.getElementById('clinic-phone').value;
+            const address = document.getElementById('clinic-address').value;
+            const specialization = document.getElementById('clinic-specialization').value;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            const registerBtn = document.getElementById('clinic-register-btn');
+            setLoading(registerBtn.id, true);
+            
+            try {
+                const userData = {
+                    type: 'clinic',
+                    name,
+                    email,
+                    password,
+                    phone,
+                    address,
+                    specialization
+                };
+                
+                const user = await register(userData);
+                
+                // Show success message
+                showSuccess('Registration successful! Redirecting to your dashboard...');
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = '/pages/clinic-dashboard.html';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showError(error.message || 'Registration failed. Please try again.');
+            } finally {
+                setLoading(registerBtn.id, false);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Prescriptions - MediMarket</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="text-primary">Medi</span><span class="text-success">Market</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/appointments.html">Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/products.html">Products</a>
+                    </li>
+                    <li class="nav-item" id="prescriptions-nav-item">
+                        <a class="nav-link active" href="/pages/prescriptions.html">Prescriptions</a>
+                    </li>
+                    <li class="nav-item" id="rewards-nav-item">
+                        <a class="nav-link" href="/pages/rewards.html">Rewards</a>
+                    </li>
+                    <li class="nav-item" id="dashboard-nav-item">
+                        <a class="nav-link" id="dashboard-link" href="#">Dashboard</a>
+                    </li>
+                    <li class="nav-item" id="logout-nav-item">
+                        <a class="nav-link" href="#" id="logout-link">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div id="error-message" class="alert alert-danger" style="display: none;" role="alert"></div>
+        <div id="success-message" class="alert alert-success" style="display: none;" role="alert"></div>
+        
+        <h1 class="mb-4">My Prescriptions</h1>
+        
+        <div id="patient-prescriptions" class="page-loader">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Prescription Modal -->
+    <div class="modal fade" id="orderPrescriptionModal" tabindex="-1" aria-labelledby="orderPrescriptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderPrescriptionModalLabel">Order Prescription Medications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="order-prescription-form">
+                        <input type="hidden" id="prescription-id" name="prescriptionId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Clinic</label>
+                            <div id="prescription-clinic-name" class="form-control-plaintext">Loading...</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Medications to Order</label>
+                            <div id="prescription-medications">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    Loading medications...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <small>
+                                <i data-feather="info" class="feather-sm"></i>
+                                Medications will be processed by the clinic and ready for pickup or delivery.
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submit-order-btn">Place Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><span class="text-primary">Medi</span><span class="text-success">Market</span></h5>
+                    <p>Your comprehensive healthcare marketplace platform.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white">Home</a></li>
+                        <li><a href="/pages/appointments.html" class="text-white">Appointments</a></li>
+                        <li><a href="/pages/products.html" class="text-white">Products</a></li>
+                        <li><a href="/pages/rewards.html" class="text-white">Rewards</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>My Account</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/pages/patient-dashboard.html#appointments" class="text-white">Appointments</a></li>
+                        <li><a href="/pages/patient-dashboard.html#orders" class="text-white">Orders</a></li>
+                        <li><a href="/pages/patient-dashboard.html#prescriptions" class="text-white">Prescriptions</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="mailto:support@medimarket.com" class="text-white">Email Us</a></li>
+                        <li><a href="tel:+1234567890" class="text-white">Call Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2023 MediMarket. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/patient.js"></script>
+    <script>
+        feather.replace();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in as a patient
+            const user = getUser();
+            if (!user || user.type !== 'patient') {
+                window.location.href = '/pages/login.html?redirect=prescriptions.html';
+                return;
+            }
+            
+            // Load prescriptions
+            loadPatientPrescriptions();
+            
+            // Add event listener for prescription order form
+            document.getElementById('order-prescription-form').addEventListener('submit', orderPrescriptionMedications);
+        });
+    </script>
+</body>
+</html>

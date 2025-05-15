@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - MediMarket</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="text-primary">Medi</span><span class="text-success">Market</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/appointments.html">Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/products.html">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/prescriptions.html">Prescriptions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/rewards.html">Rewards</a>
+                    </li>
+                    <li class="nav-item" id="dashboard-nav-item">
+                        <a class="nav-link active" href="/pages/patient-dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item" id="logout-nav-item">
+                        <a class="nav-link" href="#" id="logout-link">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div id="error-message" class="alert alert-danger" style="display: none;" role="alert"></div>
+        <div id="success-message" class="alert alert-success" style="display: none;" role="alert"></div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card profile-card">
+                    <div class="profile-header text-center">
+                        <div class="profile-img mx-auto mb-3">
+                            <i data-feather="user"></i>
+                        </div>
+                        <h4 class="patient-name">Loading...</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span><i data-feather="map-pin" class="feather-sm me-2"></i> Address:</span>
+                                <span id="patient-address">Loading...</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span><i data-feather="phone" class="feather-sm me-2"></i> Phone:</span>
+                                <span id="patient-phone">Loading...</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span><i data-feather="mail" class="feather-sm me-2"></i> Email:</span>
+                                <span id="patient-email">Loading...</span>
+                            </li>
+                        </ul>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4 rewards-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-white">Rewards Points</h5>
+                        <div class="points-circle mb-3">
+                            <div class="points-value" id="dashboard-total-points">0</div>
+                            <div class="points-label">Points</div>
+                        </div>
+                        <a href="/pages/rewards.html" class="btn btn-light">View Rewards</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <ul class="nav nav-tabs" id="patientTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="true">Appointments</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="false">Orders</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="prescriptions-tab" data-bs-toggle="tab" data-bs-target="#prescriptions" type="button" role="tab" aria-controls="prescriptions" aria-selected="false">Prescriptions</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content p-3 border border-top-0 rounded-bottom" id="patientTabContent">
+                    <div class="tab-pane fade show active" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4>My Appointments</h4>
+                            <a href="/pages/appointments.html" class="btn btn-primary btn-sm">Book New Appointment</a>
+                        </div>
+                        <div id="patient-appointments" class="page-loader">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4>My Orders</h4>
+                            <a href="/pages/products.html" class="btn btn-primary btn-sm">Shop Products</a>
+                        </div>
+                        <div id="patient-orders" class="page-loader">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="prescriptions" role="tabpanel" aria-labelledby="prescriptions-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4>My Prescriptions</h4>
+                        </div>
+                        <div id="patient-prescriptions" class="page-loader">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="update-profile-form">
+                        <div class="mb-3">
+                            <label for="patient-name-input" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="patient-name-input" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="patient-address-input" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="patient-address-input" name="address">
+                        </div>
+                        <div class="mb-3">
+                            <label for="patient-phone-input" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="patient-phone-input" name="phone">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="update-profile-btn">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Prescription Modal -->
+    <div class="modal fade" id="orderPrescriptionModal" tabindex="-1" aria-labelledby="orderPrescriptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderPrescriptionModalLabel">Order Prescription Medications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="order-prescription-form">
+                        <input type="hidden" id="prescription-id" name="prescriptionId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Clinic</label>
+                            <div id="prescription-clinic-name" class="form-control-plaintext">Loading...</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Medications to Order</label>
+                            <div id="prescription-medications">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    Loading medications...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <small>
+                                <i data-feather="info" class="feather-sm"></i>
+                                Medications will be processed by the clinic and ready for pickup or delivery.
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submit-order-btn">Place Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><span class="text-primary">Medi</span><span class="text-success">Market</span></h5>
+                    <p>Your comprehensive healthcare marketplace platform.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white">Home</a></li>
+                        <li><a href="/pages/appointments.html" class="text-white">Appointments</a></li>
+                        <li><a href="/pages/products.html" class="text-white">Products</a></li>
+                        <li><a href="/pages/rewards.html" class="text-white">Rewards</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>My Account</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/pages/patient-dashboard.html#appointments" class="text-white">Appointments</a></li>
+                        <li><a href="/pages/patient-dashboard.html#orders" class="text-white">Orders</a></li>
+                        <li><a href="/pages/patient-dashboard.html#prescriptions" class="text-white">Prescriptions</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="mailto:support@medimarket.com" class="text-white">Email Us</a></li>
+                        <li><a href="tel:+1234567890" class="text-white">Call Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2023 MediMarket. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/patient.js"></script>
+    <script>
+        feather.replace();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in as a patient
+            const user = getUser();
+            if (!user || user.type !== 'patient') {
+                window.location.href = '/pages/login.html';
+                return;
+            }
+            
+            // Load patient dashboard data
+            loadPatientDashboard();
+            
+            // Add event listener for profile update form
+            document.getElementById('update-profile-form').addEventListener('submit', updatePatientProfile);
+            
+            // Add event listener for prescription order form
+            document.getElementById('order-prescription-form').addEventListener('submit', orderPrescriptionMedications);
+            
+            // Handle tab activation based on URL hash
+            const hash = window.location.hash;
+            if (hash) {
+                const tabId = hash.substring(1) + '-tab';
+                const tab = document.getElementById(tabId);
+                if (tab) {
+                    tab.click();
+                }
+            }
+            
+            // Add event listeners for tab changes to load data
+            document.getElementById('appointments-tab').addEventListener('click', loadPatientAppointments);
+            document.getElementById('orders-tab').addEventListener('click', loadPatientOrders);
+            document.getElementById('prescriptions-tab').addEventListener('click', loadPatientPrescriptions);
+        });
+    </script>
+</body>
+</html>

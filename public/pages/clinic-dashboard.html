@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Dashboard - MediMarket</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="text-primary">Medi</span><span class="text-success">Market</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/appointments.html">Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/products.html">Products</a>
+                    </li>
+                    <li class="nav-item" id="dashboard-nav-item">
+                        <a class="nav-link active" href="/pages/clinic-dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item" id="logout-nav-item">
+                        <a class="nav-link" href="#" id="logout-link">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div id="error-message" class="alert alert-danger" style="display: none;" role="alert"></div>
+        <div id="success-message" class="alert alert-success" style="display: none;" role="alert"></div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card profile-card">
+                    <div class="profile-header text-center">
+                        <div class="profile-img mx-auto mb-3">
+                            <i data-feather="user"></i>
+                        </div>
+                        <h4 class="clinic-name">Loading...</h4>
+                        <p class="mb-0" id="clinic-specialization">Loading...</p>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span><i data-feather="map-pin" class="feather-sm me-2"></i> Address:</span>
+                                <span id="clinic-address">Loading...</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span><i data-feather="phone" class="feather-sm me-2"></i> Phone:</span>
+                                <span id="clinic-phone">Loading...</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span><i data-feather="mail" class="feather-sm me-2"></i> Email:</span>
+                                <span id="clinic-email">Loading...</span>
+                            </li>
+                        </ul>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Appointments</h5>
+                                <div class="card-value" id="total-appointments">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card dashboard-card green">
+                            <div class="card-body">
+                                <h5 class="card-title">Confirmed Appointments</h5>
+                                <div class="card-value" id="confirmed-appointments">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card dashboard-card yellow">
+                            <div class="card-body">
+                                <h5 class="card-title">Pending Appointments</h5>
+                                <div class="card-value" id="pending-appointments">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Products</h5>
+                                <div class="card-value" id="total-products">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Revenue</h5>
+                                <div class="card-value" id="total-revenue">$0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card dashboard-card green">
+                            <div class="card-body">
+                                <h5 class="card-title">This Month's Revenue</h5>
+                                <div class="card-value" id="this-month-revenue">$0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs mt-5" id="clinicTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="true">Appointments</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab" aria-controls="products" aria-selected="false">Products</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="services-tab" data-bs-toggle="tab" data-bs-target="#services" type="button" role="tab" aria-controls="services" aria-selected="false">Services</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content mt-4" id="clinicTabContent">
+            <div class="tab-pane fade show active" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Recent Appointments</h3>
+                </div>
+                <div id="clinic-appointments" class="page-loader">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="products" role="tabpanel" aria-labelledby="products-tab">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Products</h3>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i data-feather="plus" class="feather-sm"></i> Add Product
+                    </button>
+                </div>
+                <div class="row" id="clinic-products">
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="services" role="tabpanel" aria-labelledby="services-tab">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Services</h3>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                        <i data-feather="plus" class="feather-sm"></i> Add Service
+                    </button>
+                </div>
+                <div class="row" id="clinic-services">
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Clinic Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="update-profile-form">
+                        <div class="mb-3">
+                            <label for="clinic-name-input" class="form-label">Clinic Name</label>
+                            <input type="text" class="form-control" id="clinic-name-input" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clinic-address-input" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="clinic-address-input" name="address">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clinic-phone-input" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="clinic-phone-input" name="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clinic-specialization-input" class="form-label">Specialization</label>
+                            <input type="text" class="form-control" id="clinic-specialization-input" name="specialization">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="update-profile-btn">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-product-form">
+                        <div class="mb-3">
+                            <label for="add-product-name" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="add-product-name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-product-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="add-product-description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-product-price" class="form-label">Price ($)</label>
+                            <input type="number" class="form-control" id="add-product-price" name="price" step="0.01" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-product-category" class="form-label">Category</label>
+                            <input type="text" class="form-control" id="add-product-category" name="category" placeholder="e.g., Prescription, OTC, Supplements">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="add-product-in-stock" name="inStock" checked>
+                            <label class="form-check-label" for="add-product-in-stock">In Stock</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="add-product-btn">Add Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Product Modal -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-product-form">
+                        <input type="hidden" id="edit-product-id" name="id">
+                        <div class="mb-3">
+                            <label for="edit-product-name" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="edit-product-name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-product-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="edit-product-description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-product-price" class="form-label">Price ($)</label>
+                            <input type="number" class="form-control" id="edit-product-price" name="price" step="0.01" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-product-category" class="form-label">Category</label>
+                            <input type="text" class="form-control" id="edit-product-category" name="category">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="edit-product-in-stock" name="inStock">
+                            <label class="form-check-label" for="edit-product-in-stock">In Stock</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="update-product-btn">Update Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Service Modal -->
+    <div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addServiceModalLabel">Add New Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-service-form">
+                        <div class="mb-3">
+                            <label for="add-service-name" class="form-label">Service Name</label>
+                            <input type="text" class="form-control" id="add-service-name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-service-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="add-service-description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-service-price" class="form-label">Price ($)</label>
+                            <input type="number" class="form-control" id="add-service-price" name="price" step="0.01" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-service-duration" class="form-label">Duration (minutes)</label>
+                            <input type="number" class="form-control" id="add-service-duration" name="duration" min="5" step="5" value="30">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="add-service-available" name="available" checked>
+                            <label class="form-check-label" for="add-service-available">Service Available</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="add-service-btn">Add Service</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Service Modal -->
+    <div class="modal fade" id="editServiceModal" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-service-form">
+                        <input type="hidden" id="edit-service-id" name="id">
+                        <div class="mb-3">
+                            <label for="edit-service-name" class="form-label">Service Name</label>
+                            <input type="text" class="form-control" id="edit-service-name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-service-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="edit-service-description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-service-price" class="form-label">Price ($)</label>
+                            <input type="number" class="form-control" id="edit-service-price" name="price" step="0.01" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-service-duration" class="form-label">Duration (minutes)</label>
+                            <input type="number" class="form-control" id="edit-service-duration" name="duration" min="5" step="5">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="edit-service-available" name="available">
+                            <label class="form-check-label" for="edit-service-available">Service Available</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="update-service-btn">Update Service</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><span class="text-primary">Medi</span><span class="text-success">Market</span></h5>
+                    <p>Your comprehensive healthcare marketplace platform.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white">Home</a></li>
+                        <li><a href="/pages/appointments.html" class="text-white">Appointments</a></li>
+                        <li><a href="/pages/products.html" class="text-white">Products</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Clinic Management</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/pages/clinic-dashboard.html#appointments" class="text-white">Appointments</a></li>
+                        <li><a href="/pages/clinic-dashboard.html#products" class="text-white">Products</a></li>
+                        <li><a href="/pages/clinic-dashboard.html#services" class="text-white">Services</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="mailto:support@medimarket.com" class="text-white">Email Us</a></li>
+                        <li><a href="tel:+1234567890" class="text-white">Call Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2023 MediMarket. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/clinic.js"></script>
+    <script>
+        feather.replace();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in as a clinic
+            const user = getUser();
+            if (!user || user.type !== 'clinic') {
+                window.location.href = '/pages/login.html';
+                return;
+            }
+            
+            // Load clinic dashboard data
+            loadClinicDashboard();
+            
+            // Add event listener for profile update form
+            document.getElementById('update-profile-form').addEventListener('submit', updateClinicProfile);
+            
+            // Add event listener for adding a product
+            document.getElementById('add-product-form').addEventListener('submit', addProduct);
+            
+            // Add event listener for updating a product
+            document.getElementById('edit-product-form').addEventListener('submit', updateProduct);
+            
+            // Load products when the products tab is clicked
+            document.getElementById('products-tab').addEventListener('click', loadClinicProducts);
+            
+            // Handle tab activation based on URL hash
+            const hash = window.location.hash;
+            if (hash) {
+                const tabId = hash.substring(1) + '-tab';
+                const tab = document.getElementById(tabId);
+                if (tab) {
+                    tab.click();
+                }
+            }
+            
+            // Add event listener for adding a service
+            document.getElementById('add-service-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const nameInput = document.getElementById('add-service-name');
+                const descriptionInput = document.getElementById('add-service-description');
+                const priceInput = document.getElementById('add-service-price');
+                const durationInput = document.getElementById('add-service-duration');
+                const availableInput = document.getElementById('add-service-available');
+                
+                const submitButton = document.getElementById('add-service-btn');
+                setLoading(submitButton.id, true);
+                
+                try {
+                    const user = getUser();
+                    
+                    if (!user || user.type !== 'clinic') {
+                        throw new Error('You must be logged in as a clinic to add services');
+                    }
+                    
+                    const serviceData = {
+                        clinicId: user.id,
+                        name: nameInput.value.trim(),
+                        description: descriptionInput.value.trim(),
+                        price: parseFloat(priceInput.value),
+                        duration: parseInt(durationInput.value),
+                        available: availableInput.checked
+                    };
+                    
+                    authorizedFetch('/api/clinics/services', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(serviceData)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.message || 'Failed to add service');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(() => {
+                        // Reset form
+                        document.getElementById('add-service-form').reset();
+                        
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addServiceModal'));
+                        if (modal) {
+                            modal.hide();
+                        }
+                        
+                        // Load services
+                        loadClinicServices();
+                        showSuccess('Service added successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error adding service:', error);
+                        showError(error.message || 'Failed to add service');
+                    })
+                    .finally(() => {
+                        setLoading(submitButton.id, false);
+                    });
+                    
+                } catch (error) {
+                    console.error('Error adding service:', error);
+                    showError(error.message || 'Failed to add service');
+                    setLoading(submitButton.id, false);
+                }
+            });
+            
+            // Load services when the services tab is clicked
+            document.getElementById('services-tab').addEventListener('click', function() {
+                loadClinicServices();
+            });
+            
+            // Function to load clinic services
+            function loadClinicServices() {
+                try {
+                    const user = getUser();
+                    
+                    if (!user || user.type !== 'clinic') {
+                        window.location.href = '/pages/login.html';
+                        return;
+                    }
+                    
+                    authorizedFetch(`/api/clinics/${user.id}/services`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to load services');
+                        }
+                        return response.json();
+                    })
+                    .then(services => {
+                        displayClinicServices(services);
+                    })
+                    .catch(error => {
+                        console.error('Error loading clinic services:', error);
+                        showError('Failed to load services. Please try again later.');
+                    });
+                    
+                } catch (error) {
+                    console.error('Error loading clinic services:', error);
+                    showError('Failed to load services. Please try again later.');
+                }
+            }
+            
+            // Display clinic services
+            function displayClinicServices(services) {
+                const servicesContainer = document.getElementById('clinic-services');
+                
+                if (!servicesContainer) return;
+                
+                // Clear container
+                servicesContainer.innerHTML = '';
+                
+                if (services.length === 0) {
+                    servicesContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="empty-state">
+                                <i data-feather="clipboard"></i>
+                                <h4>No services yet</h4>
+                                <p>Add services to let patients know what you offer.</p>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                                    Add Service
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    if (window.feather) {
+                        feather.replace();
+                    }
+                    return;
+                }
+                
+                // Display services
+                services.forEach(service => {
+                    const serviceCard = document.createElement('div');
+                    serviceCard.className = 'col-md-4 mb-4';
+                    serviceCard.innerHTML = `
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">${escapeHtml(service.name)}</h5>
+                                <span class="badge ${service.available ? 'bg-success' : 'bg-danger'}">
+                                    ${service.available ? 'Available' : 'Unavailable'}
+                                </span>
+                                <p class="card-text mt-2">${escapeHtml(service.description || 'No description available')}</p>
+                                <p class="product-price">${formatCurrency(service.price)}</p>
+                                <p class="card-text"><small class="text-muted">Duration: ${service.duration} minutes</small></p>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <button class="btn btn-sm btn-outline-primary edit-service-btn" data-id="${service.id}" 
+                                            data-bs-toggle="modal" data-bs-target="#editServiceModal">
+                                        Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger delete-service-btn" data-id="${service.id}">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    servicesContainer.appendChild(serviceCard);
+                });
+                
+                // Add event listeners for action buttons
+                document.querySelectorAll('.edit-service-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        loadServiceForEdit(this.dataset.id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-service-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        deleteService(this.dataset.id);
+                    });
+                });
+                
+                // Re-initialize Feather icons for dynamically added content
+                if (window.feather) {
+                    feather.replace();
+                }
+            }
+            
+            // Load service for editing
+            function loadServiceForEdit(serviceId) {
+                try {
+                    authorizedFetch(`/api/clinics/services/${serviceId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to load service details');
+                        }
+                        return response.json();
+                    })
+                    .then(service => {
+                        // Populate edit form
+                        document.getElementById('edit-service-id').value = service.id;
+                        document.getElementById('edit-service-name').value = service.name;
+                        document.getElementById('edit-service-description').value = service.description || '';
+                        document.getElementById('edit-service-price').value = service.price;
+                        document.getElementById('edit-service-duration').value = service.duration;
+                        document.getElementById('edit-service-available').checked = service.available;
+                    })
+                    .catch(error => {
+                        console.error('Error loading service for edit:', error);
+                        showError('Failed to load service details. Please try again later.');
+                    });
+                    
+                } catch (error) {
+                    console.error('Error loading service for edit:', error);
+                    showError('Failed to load service details. Please try again later.');
+                }
+            }
+            
+            // Update service
+            document.getElementById('edit-service-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const serviceId = document.getElementById('edit-service-id').value;
+                const nameInput = document.getElementById('edit-service-name');
+                const descriptionInput = document.getElementById('edit-service-description');
+                const priceInput = document.getElementById('edit-service-price');
+                const durationInput = document.getElementById('edit-service-duration');
+                const availableInput = document.getElementById('edit-service-available');
+                
+                const submitButton = document.getElementById('update-service-btn');
+                setLoading(submitButton.id, true);
+                
+                try {
+                    const serviceData = {
+                        name: nameInput.value.trim(),
+                        description: descriptionInput.value.trim(),
+                        price: parseFloat(priceInput.value),
+                        duration: parseInt(durationInput.value),
+                        available: availableInput.checked
+                    };
+                    
+                    authorizedFetch(`/api/clinics/services/${serviceId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(serviceData)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.message || 'Failed to update service');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(() => {
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editServiceModal'));
+                        if (modal) {
+                            modal.hide();
+                        }
+                        
+                        // Reload services
+                        loadClinicServices();
+                        showSuccess('Service updated successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error updating service:', error);
+                        showError(error.message || 'Failed to update service');
+                    })
+                    .finally(() => {
+                        setLoading(submitButton.id, false);
+                    });
+                    
+                } catch (error) {
+                    console.error('Error updating service:', error);
+                    showError(error.message || 'Failed to update service');
+                    setLoading(submitButton.id, false);
+                }
+            });
+            
+            // Delete service
+            function deleteService(serviceId) {
+                if (!confirm('Are you sure you want to delete this service?')) {
+                    return;
+                }
+                
+                try {
+                    authorizedFetch(`/api/clinics/services/${serviceId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.message || 'Failed to delete service');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(() => {
+                        // Reload services
+                        loadClinicServices();
+                        showSuccess('Service deleted successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error deleting service:', error);
+                        showError(error.message || 'Failed to delete service');
+                    });
+                    
+                } catch (error) {
+                    console.error('Error deleting service:', error);
+                    showError(error.message || 'Failed to delete service');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
