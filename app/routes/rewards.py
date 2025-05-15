@@ -59,26 +59,31 @@ async def get_patient_rewards(
     if current_user.id != patient_id:
         raise HTTPException(status_code=403, detail="Not authorized to view these rewards")
     
-    # Get total points
-    earned_points = db.query(func.sum(RewardPoint.points)).filter(
+    # Get point transactions
+    earned_transactions = db.query(RewardPoint).filter(
         RewardPoint.patient_id == patient_id,
         RewardPoint.type == "earned"
-    ).scalar() or 0
+    ).all()
     
-    redeemed_points = db.query(func.sum(RewardPoint.points)).filter(
+    redeemed_transactions = db.query(RewardPoint).filter(
         RewardPoint.patient_id == patient_id,
         RewardPoint.type == "redeemed"
-    ).scalar() or 0
+    ).all()
     
-    try:
-        earned_points = int(earned_points)
-    except (ValueError, TypeError):
-        earned_points = 0
-        
-    try:
-        redeemed_points = int(redeemed_points)
-    except (ValueError, TypeError):
-        redeemed_points = 0
+    # Manually sum up the points since they are stored as strings
+    earned_points = 0
+    for transaction in earned_transactions:
+        try:
+            earned_points += int(transaction.points)
+        except (ValueError, TypeError):
+            pass  # Skip invalid values
+    
+    redeemed_points = 0
+    for transaction in redeemed_transactions:
+        try:
+            redeemed_points += int(transaction.points)
+        except (ValueError, TypeError):
+            pass  # Skip invalid values
     
     total_points = earned_points - redeemed_points
     
