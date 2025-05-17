@@ -199,7 +199,7 @@ async def delete_product(
 # Create an order
 @router.post("/order", response_model=OrderResponse)
 async def create_order(
-    order_data: OrderCreate,
+    order_data: dict,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
@@ -207,23 +207,40 @@ async def create_order(
     if current_user.type != "patient":
         raise HTTPException(status_code=403, detail="Only patients can create orders")
     
-    # Use current user ID if patient ID doesn't match (for security)
+    # Always use current user ID for security
     patient_id = current_user.id
     
+    # Extract items from the order data, with validation and fallbacks
+    if "items" not in order_data or not order_data["items"]:
+        raise HTTPException(status_code=400, detail="Order must contain items")
+    
+    items = order_data.get("items", [])
+    
+    # Extract product IDs from items
+    product_ids = []
+    for item in items:
+        if isinstance(item, dict) and "product_id" in item:
+            product_ids.append(item["product_id"])
+            
+    if not product_ids:
+        raise HTTPException(status_code=400, detail="No valid products found in order")
+    
     # Get products
-    product_ids = [item.product_id for item in order_data.items]
     products = db.query(Product).filter(Product.id.in_(product_ids)).all()
     
     if len(products) == 0:
-        raise HTTPException(status_code=400, detail="No valid products found")
+        raise HTTPException(status_code=400, detail="No valid products found in database")
     
     # Calculate total
     total = 0.0
-    for item in order_data.items:
-        product = next((p for p in products if p.id == item.product_id), None)
+    for item in items:
+        if not isinstance(item, dict) or "product_id" not in item:
+            continue
+            
+        product = next((p for p in products if p.id == item["product_id"]), None)
         if product:
             try:
-                item_quantity = int(item.quantity) if item.quantity else 1
+                item_quantity = int(item.get("quantity", "1"))
                 item_total = float(product.price) * item_quantity
                 total += item_total
             except (ValueError, TypeError):
@@ -231,11 +248,19 @@ async def create_order(
                 item_total = float(product.price)
                 total += item_total
     
-    # Create order
+    # Create order with a unique ID
+    order_id = str(uuid.uuid4())
+    
+    # Handle prescription ID if present
+    prescription_id = None
+    if isinstance(order_data, dict) and "prescription_id" in order_data:
+        prescription_id = order_data["prescription_id"]
+    
+    # Create the order record
     order = Order(
-        id=str(uuid.uuid4()),
+        id=order_id,
         patient_id=patient_id,  # Use the secure patient_id we defined above
-        prescription_id=order_data.prescription_id,
+        prescription_id=prescription_id,
         total=str(total),
         status="processing",
         points_earned=str(int(total * 10))  # 10 points per dollar

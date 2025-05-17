@@ -38,8 +38,9 @@ class OrderItemBase(BaseModel):
     product_id: str
     quantity: str = "1"
 
-class OrderItemCreate(OrderItemBase):
-    price: Optional[str] = None
+class OrderItemCreate(BaseModel):
+    product_id: str
+    quantity: Optional[str] = "1"
 
 class OrderItemResponse(OrderItemBase):
     id: str
