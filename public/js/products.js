@@ -269,8 +269,9 @@ function addToCart(productId, productName, productPrice, quantity = 1) {
     // Update cart badge
     updateCartBadge();
     
-    // Ask user if they want to view cart
-    if (confirm(`Added "${productName}" to your cart. View cart now?`)) {
+    // Show success message with cart options
+    const cartAction = confirm(`Added "${productName}" to your cart.\n\nClick OK to view your cart, or Cancel to continue shopping.`);
+    if (cartAction) {
         // Redirect to dedicated cart page
         window.location.href = '/pages/cart.html';
     }
