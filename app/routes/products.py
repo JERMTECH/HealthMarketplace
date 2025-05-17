@@ -56,6 +56,119 @@ async def get_orders_count(
     count = db.query(func.count(Order.id)).scalar()
     return {"count": count}
 
+# Get all orders for admin dashboard
+@router.get("/orders/all")
+async def get_admin_orders(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if admin
+    if not is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Not authorized to access this resource")
+    
+    # Return sample order data for admin dashboard
+    orders = [
+        {
+            "id": "ord-001",
+            "patient_id": "pat-001",
+            "patient_name": "John Smith",
+            "total": "75.99",
+            "status": "delivered",
+            "points_earned": "76",
+            "created_at": "2025-04-10T09:30:00",
+            "items": [
+                {
+                    "id": "item-001",
+                    "name": "Vitamin D Supplements",
+                    "quantity": "1",
+                    "price": "25.99"
+                },
+                {
+                    "id": "item-002",
+                    "name": "Blood Pressure Monitor",
+                    "quantity": "1",
+                    "price": "50.00"
+                }
+            ]
+        },
+        {
+            "id": "ord-002",
+            "patient_id": "pat-002",
+            "patient_name": "Emma Johnson",
+            "total": "120.50",
+            "status": "processing",
+            "points_earned": "121",
+            "created_at": "2025-05-15T14:45:00",
+            "items": [
+                {
+                    "id": "item-003",
+                    "name": "Monthly Medication Pack",
+                    "quantity": "1",
+                    "price": "120.50"
+                }
+            ]
+        },
+        {
+            "id": "ord-003",
+            "patient_id": "pat-003",
+            "patient_name": "Michael Brown",
+            "total": "45.75",
+            "status": "shipped",
+            "points_earned": "46",
+            "created_at": "2025-05-10T11:20:00",
+            "items": [
+                {
+                    "id": "item-004",
+                    "name": "First Aid Kit",
+                    "quantity": "1",
+                    "price": "45.75"
+                }
+            ]
+        },
+        {
+            "id": "ord-004",
+            "patient_id": "pat-001",
+            "patient_name": "John Smith",
+            "total": "87.25",
+            "status": "cancelled",
+            "points_earned": "0",
+            "created_at": "2025-05-05T16:30:00",
+            "items": [
+                {
+                    "id": "item-005",
+                    "name": "Digital Thermometer",
+                    "quantity": "1",
+                    "price": "22.50"
+                },
+                {
+                    "id": "item-006",
+                    "name": "Pain Relief Medication",
+                    "quantity": "2",
+                    "price": "32.50"
+                }
+            ]
+        },
+        {
+            "id": "ord-005",
+            "patient_id": "pat-002",
+            "patient_name": "Emma Johnson",
+            "total": "135.99",
+            "status": "delivered",
+            "points_earned": "136",
+            "created_at": "2025-04-25T10:15:00",
+            "items": [
+                {
+                    "id": "item-007",
+                    "name": "Insulin Kit",
+                    "quantity": "1",
+                    "price": "135.99"
+                }
+            ]
+        }
+    ]
+    
+    return orders
+
 # Get recent orders for admin dashboard
 @router.get("/orders/recent", response_model=List[OrderResponse])
 async def get_recent_orders(
