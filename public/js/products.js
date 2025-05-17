@@ -287,6 +287,24 @@ function showCart() {
     // Calculate total
     const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
     
+    // Create a simple cart display
+    let cartSummary = "Your Cart Items:\n\n";
+    
+    cart.forEach((item, index) => {
+        const itemTotal = parseFloat(item.price) * parseInt(item.quantity);
+        cartSummary += `${item.name} (${item.quantity} × $${item.price}) = $${itemTotal.toFixed(2)}\n`;
+    });
+    
+    cartSummary += `\n-----------------\nTotal: $${total.toFixed(2)}`;
+    
+    const checkout = confirm(`${cartSummary}\n\nWould you like to checkout now?`);
+    
+    if (checkout) {
+        proceedToCheckout();
+    }
+    
+    return;
+    
     // Create cart modal if it doesn't exist
     let cartModal = document.getElementById('cart-modal');
     
