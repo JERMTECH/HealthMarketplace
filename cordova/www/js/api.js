@@ -258,7 +258,7 @@ const PrescriptionsAPI = {
      * @returns {Promise} - Promise with prescriptions list
      */
     getPrescriptions: async () => {
-        return apiCall('/prescriptions');
+        return apiCall('/prescriptions/all');
     },
     
     /**

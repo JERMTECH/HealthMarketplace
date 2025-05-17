@@ -37,15 +37,15 @@ async def get_rewards_info(db: Session = Depends(get_db)):
         }
         shops_with_categories.append(shop_dict)
     
-    # Return rewards info with camelCase for frontend compatibility
+    # Return rewards info with snake_case as expected by the schema
     return {
-        "earnRates": {
+        "earn_rates": {
             "products": 10,  # points per $1
             "services": 5,   # points per $1
             "referral": 500  # flat points for referral
         },
-        "redemptionRate": 100,  # 100 points = $1
-        "partnerShops": shops_with_categories
+        "redemption_rate": 100,  # 100 points = $1
+        "partner_shops": shops_with_categories
     }
 
 # Get patient rewards
