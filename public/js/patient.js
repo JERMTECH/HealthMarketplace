@@ -286,9 +286,9 @@ function displayPatientOrders(orders) {
     
     if (orders.length === 0) {
         ordersContainer.innerHTML = `
-            <div class="empty-state">
-                <i data-feather="shopping-bag"></i>
-                <h4>No orders yet</h4>
+            <div class="empty-state text-center py-5">
+                <i data-feather="shopping-bag" style="width: 48px; height: 48px;"></i>
+                <h4 class="mt-3">No orders yet</h4>
                 <p>Browse our products and place your first order.</p>
                 <a href="/pages/products.html" class="btn btn-primary">Shop Now</a>
             </div>
@@ -299,54 +299,239 @@ function displayPatientOrders(orders) {
         return;
     }
     
-    // Sort orders by date (newest first)
-    orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Group orders by status
+    const ordersByStatus = {
+        processing: [],
+        shipped: [],
+        delivered: [],
+        completed: [],
+        cancelled: []
+    };
     
-    // Display orders
+    // Sort orders by date (newest first) and group by status
+    orders.sort((a, b) => new Date(b.date) - new Date(a.date));
     orders.forEach(order => {
-        const orderCard = document.createElement('div');
-        orderCard.className = 'card mb-4';
+        const status = order.status.toLowerCase();
+        if (ordersByStatus[status]) {
+            ordersByStatus[status].push(order);
+        } else {
+            // If status doesn't match predefined categories, put in processing
+            ordersByStatus.processing.push(order);
+        }
+    });
+    
+    // Create a tabbed interface for different order statuses
+    const tabsHtml = `
+        <ul class="nav nav-tabs mb-4" id="orderStatusTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-orders-tab" data-bs-toggle="tab" data-bs-target="#all-orders" type="button" role="tab">
+                    All Orders <span class="badge bg-secondary ms-1">${orders.length}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="processing-orders-tab" data-bs-toggle="tab" data-bs-target="#processing-orders" type="button" role="tab">
+                    Processing <span class="badge bg-warning text-dark ms-1">${ordersByStatus.processing.length}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="completed-orders-tab" data-bs-toggle="tab" data-bs-target="#completed-orders" type="button" role="tab">
+                    Completed <span class="badge bg-success ms-1">${ordersByStatus.completed.length + ordersByStatus.delivered.length}</span>
+                </button>
+            </li>
+        </ul>
         
-        let itemsHtml = '';
-        order.items.forEach(item => {
-            itemsHtml += `
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>
-                        <span>${escapeHtml(item.name)}</span>
-                        <small class="text-muted d-block">Qty: ${item.quantity}</small>
-                    </div>
-                    <span>${formatCurrency(item.price * item.quantity)}</span>
-                </div>
-            `;
-        });
+        <div class="tab-content" id="orderStatusTabsContent">
+            <div class="tab-pane fade show active" id="all-orders" role="tabpanel"></div>
+            <div class="tab-pane fade" id="processing-orders" role="tabpanel"></div>
+            <div class="tab-pane fade" id="completed-orders" role="tabpanel"></div>
+        </div>
+    `;
+    
+    ordersContainer.innerHTML = tabsHtml;
+    
+    // Get container references
+    const allOrdersContainer = document.getElementById('all-orders');
+    const processingOrdersContainer = document.getElementById('processing-orders');
+    const completedOrdersContainer = document.getElementById('completed-orders');
+    
+    // Create order cards and add to appropriate containers
+    orders.forEach(order => {
+        const orderCard = createOrderCard(order);
         
-        orderCard.innerHTML = `
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0">Order #${order.id.substring(0, 8)}</h5>
-                    <small class="text-muted">${formatDate(order.date)}</small>
-                </div>
-                <span class="badge ${getOrderStatusBadgeClass(order.status)}">${order.status}</span>
-            </div>
-            <div class="card-body">
-                <p class="card-text mb-3"><strong>Clinic:</strong> ${escapeHtml(order.clinicName)}</p>
-                <h6 class="border-bottom pb-2 mb-3">Order Items</h6>
-                ${itemsHtml}
-                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                    <span><strong>Total:</strong></span>
-                    <span class="fs-5 fw-bold">${formatCurrency(order.total)}</span>
-                </div>
-                <div class="mt-3">
-                    <p class="mb-1"><small class="text-muted">You earned ${order.pointsEarned} reward points from this purchase.</small></p>
-                </div>
-            </div>
-        `;
-        ordersContainer.appendChild(orderCard);
+        // Add to All orders tab
+        allOrdersContainer.appendChild(orderCard.cloneNode(true));
+        
+        // Add to status-specific tab
+        const status = order.status.toLowerCase();
+        if (status === 'processing' || status === 'shipped') {
+            processingOrdersContainer.appendChild(orderCard.cloneNode(true));
+        } else if (status === 'completed' || status === 'delivered') {
+            completedOrdersContainer.appendChild(orderCard.cloneNode(true));
+        }
     });
     
     // Re-initialize Feather icons for dynamically added content
     if (window.feather) {
         feather.replace();
+    }
+}
+
+// Helper function to create an order card
+function createOrderCard(order) {
+    const orderCard = document.createElement('div');
+    orderCard.className = 'card mb-4 order-card';
+    
+    // Add a visual indicator of order status with a colored left border
+    orderCard.style.borderLeft = `5px solid ${getOrderStatusColor(order.status)}`;
+    
+    // Format items into a table for better readability
+    let itemsHtml = `
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th style="width: 80px;">Quantity</th>
+                        <th style="width: 100px;">Price</th>
+                        <th style="width: 100px;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    // Calculate order total from items
+    let orderTotal = 0;
+    
+    order.items.forEach(item => {
+        const itemTotal = parseFloat(item.price) * parseInt(item.quantity);
+        orderTotal += itemTotal;
+        
+        itemsHtml += `
+            <tr>
+                <td>${escapeHtml(item.name)}</td>
+                <td class="text-center">${item.quantity}</td>
+                <td class="text-end">${formatCurrency(item.price)}</td>
+                <td class="text-end fw-bold">${formatCurrency(itemTotal)}</td>
+            </tr>
+        `;
+    });
+    
+    itemsHtml += `
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold">Total:</td>
+                        <td class="text-end fw-bold">${formatCurrency(orderTotal)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    `;
+    
+    // Create a formatted order date
+    const orderDate = formatDate(order.date);
+    
+    // Get order tracking information based on status
+    const trackingInfo = getOrderTrackingInfo(order.status);
+    
+    orderCard.innerHTML = `
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">Order #${order.id.substring(0, 8)}</h5>
+                    <small class="text-muted">Placed on ${orderDate}</small>
+                </div>
+                <span class="badge ${getOrderStatusBadgeClass(order.status)} fs-6">${order.status}</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="order-progress mb-4">
+                <div class="progress" style="height: 5px;">
+                    <div class="progress-bar bg-success" style="width: ${trackingInfo.progress}%" role="progressbar"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                    <small>Order Placed</small>
+                    <small>Processing</small>
+                    <small>Shipped</small>
+                    <small>Delivered</small>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h6 class="mb-2"><i data-feather="package" class="feather-sm me-1"></i> Order Information</h6>
+                    <p class="mb-1"><strong>Status:</strong> ${order.status}</p>
+                    <p class="mb-1"><strong>Date:</strong> ${orderDate}</p>
+                    <p class="mb-1"><strong>Points Earned:</strong> ${order.pointsEarned || "0"}</p>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="mb-2"><i data-feather="map-pin" class="feather-sm me-1"></i> Shipping Information</h6>
+                    <p class="mb-1"><strong>Provider:</strong> ${order.clinicName || "Healthcare Provider"}</p>
+                    <p class="mb-1"><strong>Tracking:</strong> <span class="text-primary">${trackingInfo.message}</span></p>
+                </div>
+            </div>
+            
+            <h6 class="border-bottom pb-2 mb-3">
+                <i data-feather="shopping-cart" class="feather-sm me-1"></i> Order Items
+            </h6>
+            ${itemsHtml}
+            
+            <div class="mt-3 text-muted">
+                <p class="mb-1 small"><i data-feather="award" class="feather-sm me-1"></i> You earned ${order.pointsEarned || "0"} reward points from this purchase.</p>
+                <p class="mb-0 small"><i data-feather="help-circle" class="feather-sm me-1"></i> If you have any questions about this order, please contact customer service.</p>
+            </div>
+        </div>
+    `;
+    
+    return orderCard;
+}
+
+// Get tracking message based on order status
+function getOrderTrackingInfo(status) {
+    switch (status.toLowerCase()) {
+        case 'processing':
+            return { 
+                progress: 25,
+                message: "Your order is being processed" 
+            };
+        case 'shipped':
+            return { 
+                progress: 75,
+                message: "Your order is on the way" 
+            };
+        case 'delivered':
+        case 'completed':
+            return { 
+                progress: 100,
+                message: "Your order has been delivered" 
+            };
+        case 'cancelled':
+            return { 
+                progress: 0,
+                message: "Order was cancelled" 
+            };
+        default:
+            return { 
+                progress: 10,
+                message: "Order received" 
+            };
+    }
+}
+
+// Get color for order status 
+function getOrderStatusColor(status) {
+    switch (status.toLowerCase()) {
+        case 'completed':
+        case 'delivered':
+            return '#28a745'; // Green
+        case 'processing':
+            return '#ffc107'; // Yellow
+        case 'shipped':
+            return '#17a2b8'; // Blue
+        case 'cancelled':
+            return '#dc3545'; // Red
+        default:
+            return '#6c757d'; // Gray
     }
 }
 
