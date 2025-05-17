@@ -86,7 +86,10 @@ async function login(email, password) {
             throw new Error(errorData.message || 'Login failed');
         }
         
-        const data = await response.json();
+        const data = await response.json().catch(err => {
+            console.error('Error parsing login response:', err);
+            throw new Error('Login failed: Unable to process server response');
+        });
         
         // Save token and user data
         saveUserData(data.access_token, data.user);
@@ -117,7 +120,10 @@ async function register(userData) {
             throw new Error(errorData.message || 'Registration failed');
         }
         
-        const data = await response.json();
+        const data = await response.json().catch(err => {
+            console.error('Error parsing registration response:', err);
+            throw new Error('Registration failed: Unable to process server response');
+        });
         
         // Save token and user data
         saveUserData(data.access_token, data.user);
@@ -197,6 +203,8 @@ function authorizedFetch(url, options = {}) {
     
     if (token) {
         options.headers['Authorization'] = `Bearer ${token}`;
+    } else {
+        console.warn('No auth token found for request:', url);
     }
     
     return fetch(url, options);

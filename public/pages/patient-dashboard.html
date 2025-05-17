@@ -273,9 +273,20 @@
             // Check if user is logged in as a patient
             const user = getUser();
             if (!user || user.type !== 'patient') {
+                console.error('Authentication error: User not logged in as patient', user);
                 window.location.href = '/pages/login.html';
                 return;
             }
+            
+            // Check for token
+            const token = getToken();
+            if (!token) {
+                console.error('Authentication error: No token found');
+                window.location.href = '/pages/login.html';
+                return;
+            }
+            
+            console.log('Loading dashboard for patient:', user.id);
             
             // Load patient dashboard data
             loadPatientDashboard();
