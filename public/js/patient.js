@@ -920,7 +920,8 @@ async function loadPatientDashboard() {
         
         // Load patient orders
         try {
-            const ordersResponse = await authorizedFetch(`/api/products/orders/patient/${user.id}`);
+            // This is the correct endpoint from the console logs
+            const ordersResponse = await authorizedFetch(`/api/orders/patient/${user.id}`);
             
             if (ordersResponse.ok) {
                 const orders = await ordersResponse.json();
