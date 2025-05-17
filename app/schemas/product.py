@@ -74,8 +74,9 @@ class OrderResponse(BaseModel):
     total: str
     status: str
     points_earned: str
-    date: str
-    items: List[OrderItemCustomResponse]
+    # Provide date with default value to prevent validation error
+    date: Optional[str] = None 
+    items: List[OrderItemCustomResponse] = []
     clinic_name: Optional[str] = None
 
     class Config:

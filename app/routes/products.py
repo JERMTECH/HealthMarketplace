@@ -326,17 +326,30 @@ async def create_order(
         }
         response_items.append(item_dict)
     
-    # Create order response
-    order_response = {
-        "id": order.id,
-        "patient_id": order.patient_id,
-        "prescription_id": order.prescription_id,
-        "total": order.total,
-        "status": order.status,
-        "points_earned": order.points_earned,
-        "created_at": order.created_at,
-        "updated_at": order.updated_at,
-        "items": response_items
-    }
+    # Create order response with the correct schema format
+    # Create custom order items with the required 'name' field
+    order_items_with_name = []
+    for item in response_items:
+        order_items_with_name.append(OrderItemCustomResponse(
+            id=item["id"],
+            product_id=item["product_id"],
+            name=item["product_name"] or "Unknown Product",  # Ensure name is never None
+            quantity=item["quantity"],
+            price=item["price"]
+        ))
+    
+    # Add required 'date' field as current date string
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    
+    order_response = OrderResponse(
+        id=order.id,
+        patient_id=order.patient_id,
+        prescription_id=order.prescription_id,
+        total=order.total,
+        status=order.status,
+        points_earned=order.points_earned,
+        date=current_date,  # Add the required date field
+        items=order_items_with_name
+    )
     
     return order_response
