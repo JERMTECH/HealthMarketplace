@@ -194,10 +194,14 @@ function initializeShoppingCart() {
     updateCartBadge();
     
     // Set up cart button click handler
-    const viewCartBtn = document.getElementById('view-cart-btn');
-    if (viewCartBtn) {
-        viewCartBtn.addEventListener('click', showCart);
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const viewCartBtn = document.getElementById('view-cart-btn');
+        if (viewCartBtn) {
+            viewCartBtn.addEventListener('click', function() {
+                showCart();
+            });
+        }
+    });
 }
 
 // Update cart badge with item count
