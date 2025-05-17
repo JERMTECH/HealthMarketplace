@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from sqlalchemy import func
+from typing import List, Dict
 import uuid
 
 from app.database import get_db
@@ -16,6 +17,24 @@ from app.schemas.clinic import (
 from app.auth import get_current_active_user
 
 router = APIRouter()
+
+# Helper function to check if user is admin
+def is_admin(user):
+    admin_types = ['admin', 'administrator', 'system']
+    return user.type and user.type.lower() in [t.lower() for t in admin_types]
+
+# Get clinics count for admin dashboard
+@router.get("/count", response_model=Dict[str, int])
+async def get_clinics_count(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if admin
+    if not is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Not authorized to access this resource")
+    
+    count = db.query(func.count(Clinic.id)).scalar()
+    return {"count": count}
 
 # Get all clinics
 @router.get("/all", response_model=List[ClinicResponse])

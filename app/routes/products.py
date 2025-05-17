@@ -25,6 +25,64 @@ from app.auth import get_current_active_user
 
 router = APIRouter()
 
+# Helper function to check if user is admin
+def is_admin(user):
+    admin_types = ['admin', 'administrator', 'system']
+    return user.type and user.type.lower() in [t.lower() for t in admin_types]
+
+# Get products count for admin dashboard
+@router.get("/count", response_model=Dict[str, int])
+async def get_products_count(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if admin
+    if not is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Not authorized to access this resource")
+    
+    count = db.query(func.count(Product.id)).scalar()
+    return {"count": count}
+
+# Get orders count for admin dashboard
+@router.get("/orders/count", response_model=Dict[str, int])
+async def get_orders_count(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if admin
+    if not is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Not authorized to access this resource")
+    
+    count = db.query(func.count(Order.id)).scalar()
+    return {"count": count}
+
+# Get recent orders for admin dashboard
+@router.get("/orders/recent", response_model=List[OrderResponse])
+async def get_recent_orders(
+    limit: int = 5,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if admin
+    if not is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Not authorized to access this resource")
+    
+    orders = db.query(Order).order_by(desc(Order.created_at)).limit(limit).all()
+    return orders
+
+# Get all orders for admin
+@router.get("/orders/all", response_model=List[OrderResponse])
+async def get_all_orders(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if admin
+    if not is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Not authorized to access this resource")
+    
+    orders = db.query(Order).all()
+    return orders
+
 # Get patient orders
 @router.get("/orders/patient/{patient_id}", response_model=List[OrderResponse])
 @router.get("/orders/all/patient/{patient_id}", response_model=List[OrderResponse])

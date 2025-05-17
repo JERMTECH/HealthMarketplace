@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from sqlalchemy import func
+from typing import List, Dict
 
 from app.database import get_db
 from app.models.users import User
@@ -10,14 +11,32 @@ from app.auth import get_current_active_user
 
 router = APIRouter()
 
+# Helper function to check if user is admin
+def is_admin(user):
+    admin_types = ['admin', 'administrator', 'system']
+    return user.type.lower() in [t.lower() for t in admin_types]
+
+# Get patients count for admin dashboard
+@router.get("/count", response_model=Dict[str, int])
+async def get_patients_count(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if admin
+    if not is_admin(current_user):
+        raise HTTPException(status_code=403, detail="Not authorized to access this resource")
+    
+    count = db.query(func.count(Patient.id)).scalar()
+    return {"count": count}
+
 # Get all patients (admin only in a real app)
-@router.get("/", response_model=List[PatientResponse])
+@router.get("/all", response_model=List[PatientResponse])
 async def get_patients(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # In a real app, check if admin
-    if current_user.type != "clinic":
+    # Allow both admin and clinic users
+    if not is_admin(current_user) and current_user.type != "clinic":
         raise HTTPException(status_code=403, detail="Not authorized to view all patients")
     
     patients = db.query(Patient).all()
