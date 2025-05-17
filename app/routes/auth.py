@@ -68,7 +68,8 @@ async def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
     
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.post("/token", response_model=Token)
+@router.post("/login", response_model=Token)
+@router.post("/token", response_model=Token)  # Keep the old endpoint for backwards compatibility
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
