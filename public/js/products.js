@@ -268,6 +268,11 @@ function addToCart(productId, productName, productPrice, quantity = 1) {
     
     // Update cart badge
     updateCartBadge();
+    
+    // Ask user if they want to view cart
+    if (confirm(`Added "${productName}" to your cart. View cart now?`)) {
+        showCart();
+    }
 }
 
 // Show cart
