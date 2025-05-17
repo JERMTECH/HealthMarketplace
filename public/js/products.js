@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Load products on products page
-    if (document.getElementById('products-container')) {
+    if (document.getElementById('products-list')) {
         loadProducts();
     }
     
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Load all products (with optional category filter)
 function loadProducts(category = null) {
-    const container = document.getElementById('products-container');
+    const container = document.getElementById('products-list');
     if (!container) return;
     
     // Show loading state
