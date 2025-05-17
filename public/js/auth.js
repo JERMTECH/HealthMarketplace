@@ -50,6 +50,8 @@ function updateNavigation(user) {
         if (dashboardLink) {
             if (user.type === 'clinic') {
                 dashboardLink.href = '/pages/clinic-dashboard.html';
+            } else if (user.type === 'admin') {
+                dashboardLink.href = '/pages/admin-rewards.html';
             } else {
                 dashboardLink.href = '/pages/patient-dashboard.html';
             }

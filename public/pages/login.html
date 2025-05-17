@@ -136,13 +136,24 @@
                 
                 // Redirect based on user type or specified redirect
                 setTimeout(() => {
-                    if (redirectUrl) {
+                    // Check for return URL first - this is used when admin reward page redirects here
+                    const returnUrl = getUrlParam('returnUrl');
+                    if (returnUrl) {
+                        window.location.href = returnUrl;
+                    } 
+                    // Check for explicit redirect parameter
+                    else if (redirectUrl) {
                         window.location.href = `/pages/${redirectUrl}`;
-                    } else if (user.type === 'clinic') {
+                    } 
+                    // Then handle user types
+                    else if (user.type && user.type.toLowerCase() === 'clinic') {
                         window.location.href = '/pages/clinic-dashboard.html';
-                    } else if (user.type === 'admin') {
+                    } 
+                    // Handle admin users - check case insensitively for admin type variations
+                    else if (user.type && ['admin', 'administrator', 'system'].includes(user.type.toLowerCase())) {
                         window.location.href = '/pages/admin-rewards.html';
-                    } else {
+                    } 
+                    else {
                         window.location.href = '/pages/patient-dashboard.html';
                     }
                 }, 1500);

@@ -17,11 +17,26 @@ document.addEventListener('DOMContentLoaded', function() {
 // Check if user has admin access
 function checkAdminAccess() {
     const user = getUser();
-    // More permissive check for admin types
-    const adminTypes = ['admin', 'administrator', 'system'];
-    if (!user || !adminTypes.includes(user.type)) {
-        console.log("User type:", user ? user.type : "not logged in");
+    
+    // More permissive check for admin types (case insensitive)
+    const adminTypes = ['admin', 'administrator', 'system', 'Admin', 'Administrator', 'System'];
+    
+    if (!user) {
+        console.log("Not logged in");
         window.location.href = '/pages/login.html?returnUrl=' + encodeURIComponent(window.location.pathname);
+        return;
+    }
+    
+    // Check if user type matches any admin type (case insensitive)
+    const userTypeMatches = adminTypes.some(type => 
+        user.type && user.type.toLowerCase() === type.toLowerCase()
+    );
+    
+    if (!userTypeMatches) {
+        console.log("User type not admin:", user.type);
+        window.location.href = '/pages/login.html?returnUrl=' + encodeURIComponent(window.location.pathname);
+    } else {
+        console.log("Admin access granted for:", user.name);
     }
 }
 
