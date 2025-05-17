@@ -190,44 +190,7 @@ function proceedToCheckout() {
         checkoutBtn.textContent = 'Processing...';
     }
     
-    // Directly prepare order data without patient_id
-    // The server will extract the user ID from the token
-    const orderData = {
-        items: cart.map(item => ({
-            product_id: item.id,
-            quantity: item.quantity.toString()
-        }))
-    };
-    
-    console.log("Order data:", JSON.stringify(orderData));
-    
-    // Create order - much simpler approach with better error handling
-    fetch('/api/products/order', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(orderData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error creating order');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Clear cart
-        localStorage.setItem('cart', JSON.stringify([]));
-        
-        // Show success message
-        alert('Order placed successfully!');
-        
-        // Redirect to dashboard
-        window.location.href = '/pages/patient-dashboard.html';
-    })
-    .catch(error => {
-        console.error('Error creating order:', error);
-        alert('There was an error placing your order. Please try again later.');
-    });
+    // Redirect to payment page instead of directly submitting the order
+    // The payment page will handle the payment process and order submission
+    window.location.href = '/pages/payment.html';
 }
