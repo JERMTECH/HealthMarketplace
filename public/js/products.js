@@ -207,13 +207,20 @@ function initializeShoppingCart() {
 // Update cart badge with item count
 function updateCartBadge() {
     const cartBadge = document.getElementById('cart-badge');
-    if (!cartBadge) return;
+    const cartCount = document.getElementById('cart-count');
     
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const itemCount = cart.reduce((total, item) => total + parseInt(item.quantity), 0);
     
-    cartBadge.textContent = itemCount;
-    cartBadge.style.display = itemCount > 0 ? 'inline-block' : 'none';
+    // Update both cart indicators if they exist
+    if (cartBadge) {
+        cartBadge.textContent = itemCount;
+        cartBadge.style.display = itemCount > 0 ? 'inline-block' : 'none';
+    }
+    
+    if (cartCount) {
+        cartCount.textContent = itemCount;
+    }
 }
 
 // Set up "Add to Cart" buttons
