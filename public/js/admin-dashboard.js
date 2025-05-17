@@ -467,34 +467,38 @@ async function loadClinicDropdowns() {
     }
 }
 
-// Load customers data
+// Load customers data (patients only)
 async function loadCustomers() {
     try {
-        const response = await authorizedFetch('/api/patients/all');
-        const patients = await response.json();
-        
+        // Add a loading indicator
         const customersTable = document.getElementById('customers-table');
+        customersTable.innerHTML = '<tr><td colspan="7" class="text-center">Loading customers...</td></tr>';
+        
+        // Get patients data
+        const patientsResponse = await authorizedFetch('/api/patients/all');
+        const patients = await patientsResponse.json();
         
         if (patients.length === 0) {
             customersTable.innerHTML = '<tr><td colspan="7" class="text-center">No customers found</td></tr>';
             return;
         }
         
+        // Create the HTML for the table
         let html = '';
         
         patients.forEach(patient => {
-            const status = patient.user.is_active ? 
+            const status = patient.is_active ? 
                 '<span class="badge bg-success">Active</span>' : 
                 '<span class="badge bg-danger">Inactive</span>';
             
             html += `
                 <tr>
                     <td>${patient.id.substring(0, 8)}...</td>
-                    <td>${patient.user.name}</td>
-                    <td>${patient.user.email}</td>
+                    <td>${patient.name}</td>
+                    <td>${patient.email}</td>
                     <td>${patient.phone || 'N/A'}</td>
+                    <td>${patient.date_of_birth || 'N/A'}</td>
                     <td>${formatDate(patient.created_at)}</td>
-                    <td>${status}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary me-1" onclick="viewCustomerProfile('${patient.id}')">
                             <i class="bi bi-eye"></i>
