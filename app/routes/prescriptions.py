@@ -19,8 +19,8 @@ from app.auth import get_current_active_user
 router = APIRouter()
 
 # Get all prescriptions (admin only in a real app)
-@router.get("/", response_model=List[PrescriptionResponse])
-async def get_prescriptions(
+@router.get("/all", response_model=List[PrescriptionResponse])
+async def get_all_prescriptions(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):

@@ -135,7 +135,7 @@ const ClinicsAPI = {
      * @returns {Promise} - Promise with clinics list
      */
     getAllClinics: async () => {
-        return apiCall('/clinics');
+        return apiCall('/clinics/all');
     },
     
     /**
@@ -220,8 +220,8 @@ const ProductsAPI = {
      */
     getProducts: async (category = null) => {
         const endpoint = category 
-            ? `/products?category=${encodeURIComponent(category)}`
-            : '/products';
+            ? `/products/all?category=${encodeURIComponent(category)}`
+            : '/products/all';
         return apiCall(endpoint);
     },
     

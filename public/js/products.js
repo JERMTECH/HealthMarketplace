@@ -33,7 +33,7 @@ function loadProducts(category = null) {
     `;
     
     // Fetch products (with category filter if provided)
-    let url = '/api/products';
+    let url = '/api/products/all';
     if (category) {
         url += `?category=${encodeURIComponent(category)}`;
     }
