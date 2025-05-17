@@ -361,6 +361,10 @@ async def calculate_rewards(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
+    # Accept any user with admin in their type (case insensitive)
+    if "admin" not in current_user.type.lower():
+        print(f"User attempted to calculate rewards: {current_user.type}")
+        raise HTTPException(status_code=403, detail="Only administrators can calculate rewards")
     result = calculate_reward_points(
         db=db,
         product_id=calculation_data.product_id,
