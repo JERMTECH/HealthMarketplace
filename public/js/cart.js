@@ -199,8 +199,26 @@ function proceedToCheckout() {
             'Authorization': `Bearer ${token}`
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Not authenticated');
+        }
+        return response.json();
+    })
     .then(userData => {
+        console.log("Creating order with user ID:", userData.id);
+        
+        // Create a simplified order to avoid validation errors
+        const orderData = {
+            patient_id: userData.id,
+            items: cart.map(item => ({
+                product_id: item.id,
+                quantity: item.quantity.toString()
+            }))
+        };
+        
+        console.log("Order data:", JSON.stringify(orderData));
+        
         // Create order
         return fetch('/api/products/order', {
             method: 'POST',
@@ -208,10 +226,7 @@ function proceedToCheckout() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
-                patient_id: userData.id,
-                items: orderItems
-            })
+            body: JSON.stringify(orderData)
         });
     })
     .then(response => {
