@@ -35,7 +35,19 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(clinics.router, prefix="/api/clinics", tags=["Clinics"])
 app.include_router(patients.router, prefix="/api/patients", tags=["Patients"])
 app.include_router(appointments.router, prefix="/api/appointments", tags=["Appointments"])
+# Main products router
 app.include_router(products.router, prefix="/api/products", tags=["Products"])
+
+# Set up an additional route for orders to support the frontend's current API calls
+@app.get("/api/orders/patient/{patient_id}")
+async def get_patient_orders_alias(patient_id: str, current_user = Depends(get_current_user)):
+    # This endpoint simply forwards the request to the actual implementation
+    from app.routes.products import get_patient_orders
+    from app.database import get_db
+    # Get a database session
+    db = next(get_db())
+    # Call the actual implementation
+    return await get_patient_orders(patient_id=patient_id, db=db, current_user=current_user)
 app.include_router(prescriptions_router, prefix="/api/prescriptions", tags=["Prescriptions"])
 app.include_router(rewards_router, prefix="/api/rewards", tags=["Rewards"])
 
