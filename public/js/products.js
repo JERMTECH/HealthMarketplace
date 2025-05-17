@@ -1,688 +1,520 @@
-// Products related functionality
+// Products functionality
 
-// Load available products
-async function loadProducts() {
-    try {
-        const categoryFilter = getUrlParam('category');
-        const clinicFilter = getUrlParam('clinic');
-        
-        let url = '/api/products';
-        if (categoryFilter) {
-            url += `?category=${encodeURIComponent(categoryFilter)}`;
-        } else if (clinicFilter) {
-            url += `?clinicId=${encodeURIComponent(clinicFilter)}`;
-        }
-        
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch products');
-        }
-        
-        const products = await response.json();
-        displayProducts(products);
-        
-        // Load categories for filter
+document.addEventListener('DOMContentLoaded', function() {
+    // Load products on products page
+    if (document.getElementById('products-container')) {
+        loadProducts();
+    }
+    
+    // Load product categories
+    if (document.getElementById('product-categories')) {
         loadProductCategories();
-        
-    } catch (error) {
-        console.error('Error loading products:', error);
-        const productsContainer = document.getElementById('products-list');
-        if (productsContainer) {
-            productsContainer.innerHTML = `
-                <div class="alert alert-danger" role="alert">
-                    Failed to load products. Please try again later.
+    }
+    
+    // Initialize shopping cart
+    initializeShoppingCart();
+    
+    // Set up category filter click handlers
+    setupCategoryFilters();
+});
+
+// Load all products (with optional category filter)
+function loadProducts(category = null) {
+    const container = document.getElementById('products-container');
+    if (!container) return;
+    
+    // Show loading state
+    container.innerHTML = `
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+    
+    // Fetch products (with category filter if provided)
+    let url = '/api/products';
+    if (category) {
+        url += `?category=${encodeURIComponent(category)}`;
+    }
+    
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(products => {
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center">
+                        <p class="text-muted">No products available${category ? ' in this category' : ''}.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Clear the container
+            container.innerHTML = '';
+            
+            // Display each product
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-4';
+                card.innerHTML = `
+                    <div class="card h-100 shadow-sm">
+                        ${product.image_url ? 
+                            `<img src="${product.image_url}" class="card-img-top" alt="${product.name}" style="height: 200px; object-fit: cover;">` : 
+                            `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i data-feather="package" style="width: 48px; height: 48px; color: #ccc;"></i>
+                            </div>`
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">${product.name}</h5>
+                            <p class="card-text">${product.description || 'No description available'}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-primary">$${parseFloat(product.price).toFixed(2)}</span>
+                                <button class="btn btn-outline-primary add-to-cart-btn" 
+                                    data-id="${product.id}" 
+                                    data-name="${product.name}" 
+                                    data-price="${product.price}"
+                                    ${product.in_stock ? '' : 'disabled'}>
+                                    ${product.in_stock ? 'Add to Cart' : 'Out of Stock'}
+                                </button>
+                            </div>
+                            ${product.clinic ? 
+                                `<p class="card-text mt-2">
+                                    <small class="text-muted">Sold by: 
+                                        <a href="clinic-details.html?id=${product.clinic.id}">${product.clinic.name}</a>
+                                    </small>
+                                </p>` : ''
+                            }
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            // Set up "Add to Cart" buttons
+            setupAddToCartButtons();
+            
+            // Re-initialize Feather icons
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading products:', error);
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <p class="text-danger">Failed to load products. Please try again later.</p>
+                    <button class="btn btn-outline-primary" onclick="loadProducts(${category ? `'${category}'` : ''})">Try Again</button>
                 </div>
             `;
-        }
-    }
+        });
 }
 
-// Display products
-function displayProducts(products) {
-    const productsContainer = document.getElementById('products-list');
-    if (!productsContainer) return;
+// Load product categories
+function loadProductCategories() {
+    const container = document.getElementById('product-categories');
+    if (!container) return;
     
-    // Clear container
-    productsContainer.innerHTML = '';
+    // Show loading state
+    container.innerHTML = `
+        <div class="spinner-border text-primary spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    `;
     
-    if (products.length === 0) {
-        productsContainer.innerHTML = `
-            <div class="col-12">
-                <div class="empty-state">
-                    <i data-feather="package"></i>
-                    <h4>No products available</h4>
-                    <p>We couldn't find any products matching your criteria.</p>
-                    <a href="/pages/products.html" class="btn btn-primary">View All Products</a>
-                </div>
-            </div>
-        `;
-        if (window.feather) {
-            feather.replace();
-        }
-        return;
-    }
-    
-    // Display products
-    products.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'col-md-4 mb-4';
-        productCard.innerHTML = `
-            <div class="card h-100 product-card">
-                <div class="card-body">
-                    <h5 class="card-title">${escapeHtml(product.name)}</h5>
-                    <span class="badge ${product.inStock ? 'bg-success' : 'bg-danger'}">
-                        ${product.inStock ? 'In Stock' : 'Out of Stock'}
-                    </span>
-                    <p class="card-text mt-2">${escapeHtml(product.description || 'No description available')}</p>
-                    <p class="product-price">${formatCurrency(product.price)}</p>
-                    <p class="card-text"><small class="text-muted">Category: ${escapeHtml(product.category || 'Uncategorized')}</small></p>
-                    <p class="card-text"><small class="text-muted">Offered by: ${escapeHtml(product.clinicName)}</small></p>
-                    <div class="d-grid mt-3">
-                        <button class="btn btn-primary add-to-cart-btn" data-id="${product.id}" ${!product.inStock ? 'disabled' : ''}>
-                            ${product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        productsContainer.appendChild(productCard);
-    });
-    
-    // Add event listeners for add to cart buttons
-    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            addToCart(this.dataset.id);
+    // Fetch product categories
+    fetch('/api/products/categories')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(categories => {
+            // Always include "All" category
+            let categoryHTML = `
+                <a href="#" class="list-group-item list-group-item-action active" data-category="">
+                    All Products
+                </a>
+            `;
+            
+            // Add each category
+            categories.forEach(category => {
+                categoryHTML += `
+                    <a href="#" class="list-group-item list-group-item-action" data-category="${category.name}">
+                        ${category.name} <span class="badge bg-secondary float-end">${category.count}</span>
+                    </a>
+                `;
+            });
+            
+            container.innerHTML = categoryHTML;
+            
+            // Set up category filter click handlers
+            setupCategoryFilters();
+        })
+        .catch(error => {
+            console.error('Error loading product categories:', error);
+            container.innerHTML = `
+                <div class="text-danger">Failed to load categories</div>
+            `;
+        });
+}
+
+// Set up category filter click handlers
+function setupCategoryFilters() {
+    const categoryLinks = document.querySelectorAll('#product-categories a');
+    categoryLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Update active state
+            categoryLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Get the category and load products
+            const category = this.getAttribute('data-category');
+            loadProducts(category);
         });
     });
-    
-    // Re-initialize Feather icons for dynamically added content
-    if (window.feather) {
-        feather.replace();
-    }
 }
 
-// Load product categories for filter
-async function loadProductCategories() {
-    try {
-        const response = await fetch('/api/products/categories');
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch categories');
-        }
-        
-        const categories = await response.json();
-        displayProductCategories(categories);
-        
-    } catch (error) {
-        console.error('Error loading product categories:', error);
+// Initialize shopping cart
+function initializeShoppingCart() {
+    // Create cart if it doesn't exist
+    if (!localStorage.getItem('cart')) {
+        localStorage.setItem('cart', JSON.stringify([]));
     }
-}
-
-// Display product categories
-function displayProductCategories(categories) {
-    const categoriesContainer = document.getElementById('product-categories');
-    if (!categoriesContainer) return;
-    
-    // Clear container
-    categoriesContainer.innerHTML = '<li class="list-group-item"><a href="/pages/products.html" class="text-decoration-none">All Categories</a></li>';
-    
-    // Display categories
-    categories.forEach(category => {
-        const categoryItem = document.createElement('li');
-        categoryItem.className = 'list-group-item';
-        categoryItem.innerHTML = `
-            <a href="/pages/products.html?category=${encodeURIComponent(category.name)}" class="text-decoration-none">
-                ${escapeHtml(category.name)} <span class="badge bg-light text-dark">${category.count}</span>
-            </a>
-        `;
-        categoriesContainer.appendChild(categoryItem);
-    });
-}
-
-// Add product to cart
-function addToCart(productId) {
-    // Check if user is logged in
-    const user = getUser();
-    if (!user || user.type !== 'patient') {
-        alert('Please log in as a patient to add products to cart');
-        window.location.href = '/pages/login.html?redirect=products.html';
-        return;
-    }
-    
-    // Get cart from localStorage or initialize empty cart
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    // Check if product is already in cart
-    const existingProduct = cart.find(item => item.productId === productId);
-    
-    if (existingProduct) {
-        // Increment quantity
-        existingProduct.quantity += 1;
-    } else {
-        // Add new product to cart
-        cart.push({
-            productId,
-            quantity: 1
-        });
-    }
-    
-    // Save updated cart to localStorage
-    localStorage.setItem('cart', JSON.stringify(cart));
     
     // Update cart badge
     updateCartBadge();
     
-    // Show success message
-    showToast('Product added to cart');
+    // Set up cart icon click handler
+    const cartIcon = document.getElementById('cart-icon');
+    if (cartIcon) {
+        cartIcon.addEventListener('click', showCart);
+    }
 }
 
-// Update cart badge
+// Update cart badge with item count
 function updateCartBadge() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    
     const cartBadge = document.getElementById('cart-badge');
-    if (cartBadge) {
-        if (totalItems > 0) {
-            cartBadge.textContent = totalItems;
-            cartBadge.style.display = 'inline-block';
-        } else {
-            cartBadge.style.display = 'none';
-        }
-    }
+    if (!cartBadge) return;
+    
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const itemCount = cart.reduce((total, item) => total + parseInt(item.quantity), 0);
+    
+    cartBadge.textContent = itemCount;
+    cartBadge.style.display = itemCount > 0 ? 'inline-block' : 'none';
 }
 
-// Show toast message
-function showToast(message) {
-    // Create toast container if it doesn't exist
-    let toastContainer = document.getElementById('toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.id = 'toast-container';
-        toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
-        document.body.appendChild(toastContainer);
-    }
-    
-    // Create toast element
-    const toastId = 'toast-' + Date.now();
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-    toast.innerHTML = `
-        <div class="toast-header">
-            <strong class="me-auto">MediMarket</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-            ${escapeHtml(message)}
-        </div>
-    `;
-    toastContainer.appendChild(toast);
-    
-    // Show toast
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-    
-    // Remove toast after it's hidden
-    toast.addEventListener('hidden.bs.toast', function() {
-        this.remove();
+// Set up "Add to Cart" buttons
+function setupAddToCartButtons() {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-id');
+            const productName = this.getAttribute('data-name');
+            const productPrice = this.getAttribute('data-price');
+            
+            addToCart(productId, productName, productPrice);
+            
+            // Show feedback
+            this.textContent = 'Added!';
+            setTimeout(() => {
+                this.textContent = 'Add to Cart';
+            }, 1500);
+        });
     });
 }
 
-// Load cart
-function loadCart() {
-    try {
-        // Check if user is logged in
-        const user = getUser();
-        if (!user || user.type !== 'patient') {
-            window.location.href = '/pages/login.html?redirect=cart.html';
-            return;
-        }
-        
-        // Get cart from localStorage
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        
-        if (cart.length === 0) {
-            displayEmptyCart();
-            return;
-        }
-        
-        // Load product details for cart items
-        loadCartItems(cart);
-        
-    } catch (error) {
-        console.error('Error loading cart:', error);
-        showError('Failed to load cart. Please try again later.');
+// Add item to cart
+function addToCart(productId, productName, productPrice, quantity = 1) {
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    
+    // Check if item already exists in cart
+    const existingItemIndex = cart.findIndex(item => item.id === productId);
+    
+    if (existingItemIndex >= 0) {
+        // Update quantity
+        cart[existingItemIndex].quantity += parseInt(quantity);
+    } else {
+        // Add new item
+        cart.push({
+            id: productId,
+            name: productName,
+            price: productPrice,
+            quantity: parseInt(quantity)
+        });
     }
+    
+    // Save cart
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Update cart badge
+    updateCartBadge();
 }
 
-// Display empty cart
-function displayEmptyCart() {
-    const cartItemsContainer = document.getElementById('cart-items');
-    const cartSummaryContainer = document.getElementById('cart-summary');
+// Show cart
+function showCart() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     
-    if (cartItemsContainer) {
-        cartItemsContainer.innerHTML = `
-            <div class="empty-state">
-                <i data-feather="shopping-cart"></i>
-                <h4>Your cart is empty</h4>
-                <p>Add products to your cart to proceed with checkout.</p>
-                <a href="/pages/products.html" class="btn btn-primary">Browse Products</a>
-            </div>
-        `;
-        if (window.feather) {
-            feather.replace();
-        }
+    if (cart.length === 0) {
+        alert('Your cart is empty');
+        return;
     }
     
-    if (cartSummaryContainer) {
-        cartSummaryContainer.style.display = 'none';
-    }
-}
-
-// Load cart items with product details
-async function loadCartItems(cart) {
-    try {
-        // Get product details for each cart item
-        const productIds = cart.map(item => item.productId);
-        const response = await fetch('/api/products/batch', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ productIds })
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch product details');
-        }
-        
-        const products = await response.json();
-        
-        // Create a map of product details by ID
-        const productMap = {};
-        products.forEach(product => {
-            productMap[product.id] = product;
-        });
-        
-        // Create cart items with product details
-        const cartItems = cart.map(item => {
-            const product = productMap[item.productId];
-            if (!product) return null;
-            
-            return {
-                ...item,
-                product
-            };
-        }).filter(item => item !== null);
-        
-        // Group cart items by clinic
-        const itemsByClinic = {};
-        cartItems.forEach(item => {
-            const { clinicId, clinicName } = item.product;
-            if (!itemsByClinic[clinicId]) {
-                itemsByClinic[clinicId] = {
-                    clinicName,
-                    items: []
-                };
-            }
-            itemsByClinic[clinicId].items.push(item);
-        });
-        
-        // Display cart items
-        displayCartItems(itemsByClinic);
-        
-        // Calculate and display cart summary
-        displayCartSummary(cartItems);
-        
-    } catch (error) {
-        console.error('Error loading cart items:', error);
-        showError('Failed to load cart items. Please try again later.');
-    }
-}
-
-// Display cart items
-function displayCartItems(itemsByClinic) {
-    const cartItemsContainer = document.getElementById('cart-items');
-    if (!cartItemsContainer) return;
+    // Calculate total
+    const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
     
-    // Clear container
-    cartItemsContainer.innerHTML = '';
+    // Create cart modal if it doesn't exist
+    let cartModal = document.getElementById('cart-modal');
     
-    // Display cart items grouped by clinic
-    Object.entries(itemsByClinic).forEach(([clinicId, clinic]) => {
-        const clinicCard = document.createElement('div');
-        clinicCard.className = 'card mb-4';
+    if (!cartModal) {
+        cartModal = document.createElement('div');
+        cartModal.id = 'cart-modal';
+        cartModal.className = 'modal fade';
+        cartModal.tabIndex = '-1';
+        cartModal.setAttribute('aria-labelledby', 'cart-modal-label');
+        cartModal.setAttribute('aria-hidden', 'true');
         
-        let itemsHtml = '';
-        clinic.items.forEach(item => {
-            itemsHtml += `
-                <div class="row cart-item mb-3" data-id="${item.productId}">
-                    <div class="col-md-8">
-                        <h5>${escapeHtml(item.product.name)}</h5>
-                        <p class="text-muted">${escapeHtml(item.product.category || 'Uncategorized')}</p>
-                        <p class="product-price">${formatCurrency(item.product.price)}</p>
+        cartModal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cart-modal-label">Shopping Cart</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-center justify-content-end">
-                            <div class="input-group quantity-group" style="width: 120px;">
-                                <button class="btn btn-outline-secondary decrease-quantity" type="button">-</button>
-                                <input type="number" class="form-control text-center item-quantity" value="${item.quantity}" min="1" max="99">
-                                <button class="btn btn-outline-secondary increase-quantity" type="button">+</button>
-                            </div>
-                            <button class="btn btn-link text-danger remove-item-btn ms-2">
-                                <i data-feather="trash-2"></i>
-                            </button>
-                        </div>
-                        <div class="text-end mt-2">
-                            <span class="item-total">${formatCurrency(item.product.price * item.quantity)}</span>
-                        </div>
+                    <div class="modal-body" id="cart-modal-body">
+                        <!-- Cart items will go here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="checkout-btn">Checkout</button>
                     </div>
                 </div>
-            `;
-        });
-        
-        clinicCard.innerHTML = `
-            <div class="card-header">
-                <h5 class="mb-0">${escapeHtml(clinic.clinicName)}</h5>
-            </div>
-            <div class="card-body">
-                ${itemsHtml}
             </div>
         `;
         
-        cartItemsContainer.appendChild(clinicCard);
+        document.body.appendChild(cartModal);
+        
+        // Initialize Bootstrap modal
+        cartModal = new bootstrap.Modal(cartModal);
+    }
+    
+    // Update cart items
+    const cartModalBody = document.getElementById('cart-modal-body');
+    
+    let cartHTML = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    cart.forEach((item, index) => {
+        cartHTML += `
+            <tr>
+                <td>${item.name}</td>
+                <td>
+                    <div class="input-group input-group-sm" style="width: 100px;">
+                        <button class="btn btn-outline-secondary decrease-qty" type="button" data-index="${index}">-</button>
+                        <input type="text" class="form-control text-center" value="${item.quantity}" readonly>
+                        <button class="btn btn-outline-secondary increase-qty" type="button" data-index="${index}">+</button>
+                    </div>
+                </td>
+                <td>$${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger remove-item" data-index="${index}">
+                        <i data-feather="trash-2" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
     });
     
-    // Add event listeners for quantity buttons and remove buttons
-    document.querySelectorAll('.decrease-quantity').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const input = this.parentElement.querySelector('.item-quantity');
-            if (input.value > 1) {
-                input.value = parseInt(input.value) - 1;
-                updateCartItemQuantity(this.closest('.cart-item').dataset.id, parseInt(input.value));
-            }
-        });
-    });
+    cartHTML += `
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="2">Total:</th>
+                    <th>$${total.toFixed(2)}</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    `;
     
-    document.querySelectorAll('.increase-quantity').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const input = this.parentElement.querySelector('.item-quantity');
-            if (input.value < 99) {
-                input.value = parseInt(input.value) + 1;
-                updateCartItemQuantity(this.closest('.cart-item').dataset.id, parseInt(input.value));
-            }
-        });
-    });
+    cartModalBody.innerHTML = cartHTML;
     
-    document.querySelectorAll('.item-quantity').forEach(input => {
-        input.addEventListener('change', function() {
-            let value = parseInt(this.value);
-            if (isNaN(value) || value < 1) value = 1;
-            if (value > 99) value = 99;
-            this.value = value;
-            updateCartItemQuantity(this.closest('.cart-item').dataset.id, value);
-        });
-    });
+    // Set up event listeners for cart operations
+    setupCartEventListeners();
     
-    document.querySelectorAll('.remove-item-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            removeCartItem(this.closest('.cart-item').dataset.id);
-        });
-    });
-    
-    // Re-initialize Feather icons for dynamically added content
-    if (window.feather) {
+    // Re-initialize Feather icons
+    if (typeof feather !== 'undefined') {
         feather.replace();
     }
+    
+    // Show the modal
+    cartModal.show();
 }
 
-// Display cart summary
-function displayCartSummary(cartItems) {
-    const cartSummaryContainer = document.getElementById('cart-summary');
-    if (!cartSummaryContainer) return;
+// Set up event listeners for cart operations
+function setupCartEventListeners() {
+    // Increase quantity
+    document.querySelectorAll('.increase-qty').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            updateCartItemQuantity(index, 1);
+        });
+    });
     
-    // Calculate subtotal
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+    // Decrease quantity
+    document.querySelectorAll('.decrease-qty').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            updateCartItemQuantity(index, -1);
+        });
+    });
     
-    // Calculate estimated points
-    const estimatedPoints = Math.floor(subtotal * 10); // 10 points per dollar
+    // Remove item
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            removeCartItem(index);
+        });
+    });
     
-    // Update summary values
-    document.getElementById('cart-subtotal').textContent = formatCurrency(subtotal);
-    document.getElementById('cart-total').textContent = formatCurrency(subtotal);
-    document.getElementById('estimated-points').textContent = estimatedPoints;
-    
-    // Show summary container
-    cartSummaryContainer.style.display = 'block';
+    // Checkout
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', proceedToCheckout);
+    }
 }
 
 // Update cart item quantity
-function updateCartItemQuantity(productId, quantity) {
-    // Get cart from localStorage
+function updateCartItemQuantity(index, change) {
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     
-    // Find the item in the cart
-    const itemIndex = cart.findIndex(item => item.productId === productId);
+    // Update quantity (minimum 1)
+    cart[index].quantity = Math.max(1, parseInt(cart[index].quantity) + change);
     
-    if (itemIndex !== -1) {
-        // Update quantity
-        cart[itemIndex].quantity = quantity;
-        
-        // Save updated cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(cart));
-        
-        // Update the item total price
-        const priceElement = document.querySelector(`.cart-item[data-id="${productId}"] .product-price`);
-        const totalElement = document.querySelector(`.cart-item[data-id="${productId}"] .item-total`);
-        
-        if (priceElement && totalElement) {
-            const price = parseFloat(priceElement.textContent.replace(/[^0-9.-]+/g, ''));
-            totalElement.textContent = formatCurrency(price * quantity);
-        }
-        
-        // Recalculate summary
-        recalculateCartSummary();
-        
-        // Update cart badge
-        updateCartBadge();
-    }
-}
-
-// Remove cart item
-function removeCartItem(productId) {
-    // Get cart from localStorage
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    // Remove the item from the cart
-    cart = cart.filter(item => item.productId !== productId);
-    
-    // Save updated cart to localStorage
+    // Save cart
     localStorage.setItem('cart', JSON.stringify(cart));
     
     // Update cart badge
     updateCartBadge();
     
-    // Check if cart is empty
+    // Re-render cart
+    showCart();
+}
+
+// Remove item from cart
+function removeCartItem(index) {
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    
+    // Remove the item
+    cart.splice(index, 1);
+    
+    // Save cart
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Update cart badge
+    updateCartBadge();
+    
     if (cart.length === 0) {
-        displayEmptyCart();
-        return;
-    }
-    
-    // Remove the item from the DOM
-    const itemElement = document.querySelector(`.cart-item[data-id="${productId}"]`);
-    if (itemElement) {
-        const parentCard = itemElement.closest('.card');
-        itemElement.remove();
-        
-        // If no more items in the clinic card, remove the card
-        if (parentCard && parentCard.querySelectorAll('.cart-item').length === 0) {
-            parentCard.remove();
+        // Hide modal if cart is empty
+        const cartModal = bootstrap.Modal.getInstance(document.getElementById('cart-modal'));
+        if (cartModal) {
+            cartModal.hide();
         }
+    } else {
+        // Re-render cart
+        showCart();
     }
-    
-    // Recalculate summary
-    recalculateCartSummary();
 }
 
-// Recalculate cart summary
-function recalculateCartSummary() {
-    const totalElements = document.querySelectorAll('.item-total');
-    let subtotal = 0;
-    
-    totalElements.forEach(el => {
-        subtotal += parseFloat(el.textContent.replace(/[^0-9.-]+/g, ''));
-    });
-    
-    // Update summary values
-    document.getElementById('cart-subtotal').textContent = formatCurrency(subtotal);
-    document.getElementById('cart-total').textContent = formatCurrency(subtotal);
-    document.getElementById('estimated-points').textContent = Math.floor(subtotal * 10);
-}
-
-// Checkout process
-async function checkout() {
+// Proceed to checkout
+function proceedToCheckout() {
     // Check if user is logged in
-    const user = getUser();
-    if (!user || user.type !== 'patient') {
-        alert('Please log in as a patient to checkout');
-        window.location.href = '/pages/login.html?redirect=cart.html';
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        // If not logged in, redirect to login page with return URL
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `login.html?returnUrl=${returnUrl}`;
         return;
     }
     
-    // Get cart from localStorage
+    // Get cart items
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     
     if (cart.length === 0) {
-        showError('Your cart is empty');
+        alert('Your cart is empty');
         return;
     }
     
-    const checkoutBtn = document.getElementById('checkout-btn');
-    setLoading(checkoutBtn.id, true);
+    // Prepare order data
+    const orderItems = cart.map(item => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        price: item.price
+    }));
     
-    try {
-        // Prepare order data
-        const orderData = {
-            patientId: user.id,
-            items: cart
-        };
-        
-        const response = await authorizedFetch('/api/orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(orderData)
-        });
-        
+    // Calculate total
+    const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
+    
+    const orderData = {
+        items: orderItems,
+        total: total.toString()
+    };
+    
+    // Create order
+    fetch('/api/products/orders', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => {
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to place order');
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
-        const orderResult = await response.json();
-        
+        return response.json();
+    })
+    .then(order => {
         // Clear cart
-        localStorage.removeItem('cart');
+        localStorage.setItem('cart', JSON.stringify([]));
         
         // Update cart badge
         updateCartBadge();
         
-        // Show checkout success
-        showCheckoutSuccess(orderResult);
-        
-    } catch (error) {
-        console.error('Error during checkout:', error);
-        showError(error.message || 'Failed to place order');
-    } finally {
-        setLoading(checkoutBtn.id, false);
-    }
-}
-
-// Show checkout success
-function showCheckoutSuccess(order) {
-    const cartContainer = document.getElementById('cart-container');
-    const successContainer = document.getElementById('checkout-success');
-    
-    if (cartContainer && successContainer) {
-        // Hide cart container
-        cartContainer.style.display = 'none';
-        
-        // Update order details in success message
-        document.getElementById('order-number').textContent = order.id.substring(0, 8);
-        document.getElementById('order-points').textContent = order.pointsEarned;
-        document.getElementById('order-total').textContent = formatCurrency(order.total);
-        
-        // Show success container
-        successContainer.style.display = 'block';
-    }
-}
-
-// Return to shopping
-function returnToShopping() {
-    window.location.href = '/pages/products.html';
-}
-
-// View orders
-function viewOrders() {
-    window.location.href = '/pages/patient-dashboard.html#orders';
-}
-
-// Initialize products page
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if we're on the products page
-    if (window.location.pathname.includes('/products.html')) {
-        loadProducts();
-        
-        // Update cart badge
-        updateCartBadge();
-    }
-    
-    // Check if we're on the cart page
-    if (window.location.pathname.includes('/cart.html')) {
-        loadCart();
-        
-        // Add event listener for checkout button
-        const checkoutBtn = document.getElementById('checkout-btn');
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', checkout);
+        // Hide modal
+        const cartModal = bootstrap.Modal.getInstance(document.getElementById('cart-modal'));
+        if (cartModal) {
+            cartModal.hide();
         }
         
-        // Add event listeners for success buttons
-        const continueShoppingBtn = document.getElementById('continue-shopping-btn');
-        if (continueShoppingBtn) {
-            continueShoppingBtn.addEventListener('click', returnToShopping);
-        }
+        // Show success message
+        alert(`Order placed successfully! Order ID: ${order.id}`);
         
-        const viewOrdersBtn = document.getElementById('view-orders-btn');
-        if (viewOrdersBtn) {
-            viewOrdersBtn.addEventListener('click', viewOrders);
-        }
-    }
-    
-    // Add cart link to navbar
-    const navbarNav = document.getElementById('navbarNav');
-    if (navbarNav) {
-        const cartLink = document.createElement('li');
-        cartLink.className = 'nav-item';
-        cartLink.innerHTML = `
-            <a class="nav-link" href="/pages/cart.html">
-                <i data-feather="shopping-cart"></i>
-                <span id="cart-badge" class="badge bg-danger" style="display: none;"></span>
-            </a>
-        `;
-        navbarNav.querySelector('ul').appendChild(cartLink);
-        
-        // Update cart badge
-        updateCartBadge();
-        
-        // Re-initialize Feather icons
-        if (window.feather) {
-            feather.replace();
-        }
-    }
-});
+        // Redirect to order confirmation page (if exists)
+        // window.location.href = `order-confirmation.html?id=${order.id}`;
+    })
+    .catch(error => {
+        console.error('Error creating order:', error);
+        alert('Failed to place order. Please try again later.');
+    });
+}
