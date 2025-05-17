@@ -62,8 +62,20 @@ async def health_check():
         }
     }
 
-# Mount static files - IMPORTANT: This must be the last route to be added
-app.mount("/", StaticFiles(directory="public", html=True), name="static")
+# Add a specific API route for the clinics endpoint for debugging
+@app.get("/api/clinics-debug")
+async def get_clinics_debug():
+    """Debug endpoint to test clinics routing."""
+    return {"message": "API is working"}
+
+# Mount static files - IMPORTANT: The order matters here
+# API routes should be registered before mounting static files
+# Mount the static file directories first to avoid conflict with API routes
+app.mount("/css", StaticFiles(directory="public/css"), name="css")
+app.mount("/js", StaticFiles(directory="public/js"), name="js")
+app.mount("/pages", StaticFiles(directory="public/pages", html=True), name="pages")
+# Mount the root last
+app.mount("/", StaticFiles(directory="public", html=True), name="root")
 
 if __name__ == "__main__":
     # Get port from environment variable or use default
