@@ -504,7 +504,7 @@ function saveRewardConfiguration() {
 // Delete reward configuration
 function deleteRewardConfiguration(configId) {
     if (confirm('Are you sure you want to delete this configuration? This action cannot be undone.')) {
-        fetch(`/api/rewards/config/configurations/${configId}`, {
+        authorizedFetch(`/api/rewards/config/configurations/${configId}`, {
             method: 'DELETE'
         })
             .then(response => {
@@ -543,7 +543,7 @@ function deleteRewardConfiguration(configId) {
 
 // Edit season
 function editSeason(seasonId) {
-    fetch(`/api/rewards/config/seasons/${seasonId}`)
+    authorizedFetch(`/api/rewards/config/seasons/${seasonId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to load season');
@@ -615,7 +615,7 @@ function saveSeason() {
     
     const method = seasonId ? 'PUT' : 'POST';
     
-    fetch(url, {
+    authorizedFetch(url, {
         method,
         headers: {
             'Content-Type': 'application/json'
@@ -664,7 +664,7 @@ function saveSeason() {
 // Delete season
 function deleteSeason(seasonId) {
     if (confirm('Are you sure you want to delete this season? This action cannot be undone.')) {
-        fetch(`/api/rewards/config/seasons/${seasonId}`, {
+        authorizedFetch(`/api/rewards/config/seasons/${seasonId}`, {
             method: 'DELETE'
         })
             .then(response => {
@@ -726,7 +726,7 @@ function calculateRewards() {
         category: category || null
     };
     
-    fetch('/api/rewards/config/calculate', {
+    authorizedFetch('/api/rewards/config/calculate', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
