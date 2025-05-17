@@ -925,9 +925,13 @@ async function loadPatientDashboard() {
             
             if (ordersResponse.ok) {
                 const orders = await ordersResponse.json();
-                displayPatientOrders(orders);
+                console.log('Orders loaded successfully:', orders);
+                
+                // Force a direct call to loadPatientOrders (avoiding any caching issues)
+                loadPatientOrders();
             } else {
                 // If there's an error (like 404), display empty orders
+                console.error('Error loading orders: response not OK');
                 displayPatientOrders([]);
             }
         } catch (error) {
