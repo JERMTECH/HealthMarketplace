@@ -53,10 +53,15 @@ app.include_router(prescriptions_router, prefix="/api/prescriptions", tags=["Pre
 app.include_router(rewards_router, prefix="/api/rewards", tags=["Rewards"])
 app.include_router(reward_config_router, prefix="/api/rewards/config", tags=["Reward Configuration"])
 
-# Create sample data
+# Create sample data and admin user
 @app.on_event("startup")
 async def startup_event():
     create_initial_data()
+    # Create admin user on startup
+    from app.updates.add_admin_user import add_admin_user
+    from app.database import get_db
+    db = next(get_db())
+    add_admin_user(db)
 
 @app.get("/api/health")
 async def health_check():
