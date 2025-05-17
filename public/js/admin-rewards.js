@@ -139,7 +139,7 @@ function loadRewardConfigurations() {
     const tableBody = document.getElementById('config-table-body');
     tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading configurations...</td></tr>';
     
-    fetch('/api/rewards/config/configurations')
+    authorizedFetch('/api/rewards/config/configurations')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to load configurations');
@@ -226,7 +226,7 @@ function loadSeasons() {
     const tableBody = document.getElementById('season-table-body');
     tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading seasons...</td></tr>';
     
-    fetch('/api/rewards/config/seasons')
+    authorizedFetch('/api/rewards/config/seasons')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to load seasons');
@@ -306,7 +306,7 @@ function loadSeasons() {
 function loadProducts() {
     const dropdown = document.getElementById('product-dropdown');
     
-    fetch('/api/products/all')
+    authorizedFetch('/api/products/all')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to load products');
@@ -355,7 +355,7 @@ function loadProducts() {
 
 // Edit reward configuration
 function editRewardConfiguration(configId) {
-    fetch(`/api/rewards/config/configurations/${configId}`)
+    authorizedFetch(`/api/rewards/config/configurations/${configId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to load configuration');
@@ -455,7 +455,7 @@ function saveRewardConfiguration() {
     
     const method = configId ? 'PUT' : 'POST';
     
-    fetch(url, {
+    authorizedFetch(url, {
         method,
         headers: {
             'Content-Type': 'application/json'
