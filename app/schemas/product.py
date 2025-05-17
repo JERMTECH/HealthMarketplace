@@ -39,7 +39,7 @@ class OrderItemBase(BaseModel):
     quantity: str = "1"
 
 class OrderItemCreate(OrderItemBase):
-    pass
+    price: Optional[str] = None
 
 class OrderItemResponse(OrderItemBase):
     id: str
