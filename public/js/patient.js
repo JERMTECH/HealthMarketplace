@@ -255,7 +255,7 @@ async function loadPatientOrders() {
             return;
         }
         
-        const response = await authorizedFetch(`/api/products/orders/patient/${user.id}`);
+        const response = await authorizedFetch(`/api/orders/patient/${user.id}`);
         
         if (!response.ok) {
             // If 404, just show empty orders
