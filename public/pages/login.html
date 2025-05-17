@@ -140,6 +140,8 @@
                         window.location.href = `/pages/${redirectUrl}`;
                     } else if (user.type === 'clinic') {
                         window.location.href = '/pages/clinic-dashboard.html';
+                    } else if (user.type === 'admin') {
+                        window.location.href = '/pages/admin-rewards.html';
                     } else {
                         window.location.href = '/pages/patient-dashboard.html';
                     }
