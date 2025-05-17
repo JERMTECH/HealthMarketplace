@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - MediMarket</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .cart-banner {
+            background-color: #ff0000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .cart-link {
+            color: white;
+            text-decoration: none;
+            border: 3px solid white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-left: 15px;
+        }
+        .cart-link:hover {
+            background-color: white;
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="text-primary">Medi</span><span class="text-success">Market</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/pages/products-with-cart.html">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/appointments.html">Appointments</a>
+                    </li>
+                    <li class="nav-item" id="auth-nav-item">
+                        <a class="nav-link" href="/pages/login.html">Login / Register</a>
+                    </li>
+                    <li class="nav-item" id="logout-nav-item" style="display: none;">
+                        <a class="nav-link" href="#" id="logout-link">Logout</a>
+                    </li>
+                </ul>
+                <a href="/pages/cart.html" class="btn btn-success ms-2">
+                    <i data-feather="shopping-cart" class="me-1"></i>
+                    View Cart <span id="nav-cart-count" class="badge bg-light text-dark ms-1">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="cart-banner">
+        Your Cart is Waiting! <a href="/pages/cart.html" class="cart-link">GO TO CART NOW</a>
+    </div>
+
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h1>Healthcare Products</h1>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="/pages/cart.html" class="btn btn-danger btn-lg mb-3">
+                    🛒 VIEW CART <span id="cart-count" class="badge bg-light text-dark ms-1">0</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <div class="card-header">Categories</div>
+                    <div class="list-group list-group-flush" id="product-categories">
+                        <div class="text-center p-3">
+                            <div class="spinner-border text-primary spinner-border-sm" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <div class="row" id="products-list">
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><span class="text-primary">Medi</span><span class="text-success">Market</span></h5>
+                    <p>Your one-stop healthcare marketplace.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="/pages/cart.html" class="btn btn-outline-primary">
+                        <i data-feather="shopping-cart" class="me-1"></i>
+                        View Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/products.js"></script>
+    <script>
+        // Initialize Feather icons
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+        });
+    </script>
+</body>
+</html>
