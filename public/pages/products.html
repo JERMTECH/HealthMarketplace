@@ -97,6 +97,10 @@
                         <h5 class="mb-0" id="product-count">All Products</h5>
                     </div>
                     <div class="d-flex align-items-center">
+                        <button id="view-cart-btn" class="btn btn-outline-primary me-3" onclick="showCart()">
+                            <i data-feather="shopping-cart" class="me-1" style="width: 16px; height: 16px;"></i>
+                            View Cart <span id="cart-badge" class="badge bg-primary ms-1">0</span>
+                        </button>
                         <label for="sort-by" class="me-2">Sort by:</label>
                         <select class="form-select form-select-sm" id="sort-by" style="width: auto;">
                             <option value="name-asc">Name (A-Z)</option>
