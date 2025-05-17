@@ -474,13 +474,21 @@ function proceedToCheckout() {
     // Calculate total
     const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
     
+    // Get current user
+    const user = getUser();
+    if (!user || user.type !== 'patient') {
+        alert('You must be logged in as a patient to place an order');
+        return;
+    }
+    
     const orderData = {
+        patient_id: user.id,
         items: orderItems,
         total: total.toString()
     };
     
     // Create order
-    fetch('/api/products/orders', {
+    fetch('/api/products/order', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
