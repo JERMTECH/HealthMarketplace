@@ -734,14 +734,21 @@ async function loadPatientDashboard() {
         displayPatientAppointments(appointments);
         
         // Load patient orders
-        const ordersResponse = await authorizedFetch(`/api/orders/patient/${user.id}`);
-        
-        if (!ordersResponse.ok) {
-            throw new Error('Failed to load orders');
+        try {
+            const ordersResponse = await authorizedFetch(`/api/products/orders/patient/${user.id}`);
+            
+            if (ordersResponse.ok) {
+                const orders = await ordersResponse.json();
+                displayPatientOrders(orders);
+            } else {
+                // If there's an error (like 404), display empty orders
+                displayPatientOrders([]);
+            }
+        } catch (error) {
+            console.error('Error loading orders:', error);
+            // Display empty orders on error
+            displayPatientOrders([]);
         }
-        
-        const orders = await ordersResponse.json();
-        displayPatientOrders(orders);
         
         // Load patient rewards
         const rewardsResponse = await authorizedFetch(`/api/rewards/patient/${user.id}`);

@@ -25,6 +25,7 @@ router = APIRouter()
 
 # Get patient orders
 @router.get("/orders/patient/{patient_id}", response_model=List[OrderResponse])
+@router.get("/orders/all/patient/{patient_id}", response_model=List[OrderResponse])
 async def get_patient_orders(
     patient_id: str,
     db: Session = Depends(get_db),
