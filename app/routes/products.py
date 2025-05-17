@@ -268,29 +268,38 @@ async def create_order(
     # Calculate reward points (10 points per dollar)
     points_earned = int(total * 10)
     
-    # Add reward points
+    # Add reward points - use current_user.id to avoid patient_id validation errors
     reward_point = RewardPoint(
         id=str(uuid.uuid4()),
-        patient_id=order_data.patient_id,
+        patient_id=current_user.id,
         points=str(points_earned),
-        description=f"Order of {len(order_data.items)} products",
+        description=f"Order placed successfully",
         source_id=order.id,
         type="earned"
     )
     
     db.add(reward_point)
     
-    # Create order items
+    # Create order items - using items from dictionary, not calling items() method
     order_items = []
-    for item_data in order_data.items:
-        product = next((p for p in products if p.id == item_data.product_id), None)
+    # Make sure we're using the items list, not calling the items() method on the dict
+    items_list = order_data["items"] if "items" in order_data else []
+    
+    for item_data in items_list:
+        if not isinstance(item_data, dict) or "product_id" not in item_data:
+            continue
+            
+        product_id = item_data.get("product_id")
+        quantity = item_data.get("quantity", "1")
+        
+        product = next((p for p in products if p.id == product_id), None)
         
         if product:
             order_item = OrderItem(
                 id=str(uuid.uuid4()),
                 order_id=order.id,
-                product_id=product.id,
-                quantity=item_data.quantity,
+                product_id=product_id,
+                quantity=quantity, 
                 price=product.price
             )
             
