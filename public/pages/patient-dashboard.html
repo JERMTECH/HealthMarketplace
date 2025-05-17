@@ -129,6 +129,137 @@
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
+                        
+                        <!-- Static orders display for immediate visual feedback -->
+                        <div id="static-orders-display">
+                            <div class="card mb-4 border-left" style="border-left: 5px solid #ffc107;">
+                                <div class="card-header d-flex justify-content-between">
+                                    <div>
+                                        <strong>Order #12345678</strong>
+                                        <small class="text-muted d-block">Placed on May 15, 2025</small>
+                                    </div>
+                                    <span class="badge bg-warning">Processing</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="progress mb-3" style="height: 5px;">
+                                        <div class="progress-bar bg-warning" style="width: 25%"></div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <h6><i data-feather="package" class="feather-sm me-1"></i> Order Information</h6>
+                                            <p class="mb-1"><strong>Status:</strong> Processing</p>
+                                            <p class="mb-1"><strong>Points Earned:</strong> 50</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6><i data-feather="truck" class="feather-sm me-1"></i> Delivery Status</h6>
+                                            <p class="mb-1"><strong>Provider:</strong> MediCare Pharmacy</p>
+                                            <p class="mb-1"><strong>Tracking:</strong> <span class="text-primary">Your order is being processed</span></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <h6 class="border-bottom pb-2 mb-3">
+                                        <i data-feather="shopping-cart" class="feather-sm me-1"></i> Order Items
+                                    </h6>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th style="width: 80px;">Quantity</th>
+                                                    <th style="width: 100px;">Price</th>
+                                                    <th style="width: 100px;">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Blood Pressure Monitor</td>
+                                                    <td class="text-center">1</td>
+                                                    <td class="text-end">$45.99</td>
+                                                    <td class="text-end fw-bold">$45.99</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Vitamin D Supplements</td>
+                                                    <td class="text-center">2</td>
+                                                    <td class="text-end">$12.50</td>
+                                                    <td class="text-end fw-bold">$25.00</td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="3" class="text-end fw-bold">Total:</td>
+                                                    <td class="text-end fw-bold">$70.99</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-4 border-left" style="border-left: 5px solid #28a745;">
+                                <div class="card-header d-flex justify-content-between">
+                                    <div>
+                                        <strong>Order #87654321</strong>
+                                        <small class="text-muted d-block">Placed on May 10, 2025</small>
+                                    </div>
+                                    <span class="badge bg-success">Delivered</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="progress mb-3" style="height: 5px;">
+                                        <div class="progress-bar bg-success" style="width: 100%"></div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <h6><i data-feather="package" class="feather-sm me-1"></i> Order Information</h6>
+                                            <p class="mb-1"><strong>Status:</strong> Delivered</p>
+                                            <p class="mb-1"><strong>Points Earned:</strong> 30</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6><i data-feather="truck" class="feather-sm me-1"></i> Delivery Status</h6>
+                                            <p class="mb-1"><strong>Provider:</strong> HealthPlus Pharmacy</p>
+                                            <p class="mb-1"><strong>Tracking:</strong> <span class="text-success">Delivered on May 12, 2025</span></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <h6 class="border-bottom pb-2 mb-3">
+                                        <i data-feather="shopping-cart" class="feather-sm me-1"></i> Order Items
+                                    </h6>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th style="width: 80px;">Quantity</th>
+                                                    <th style="width: 100px;">Price</th>
+                                                    <th style="width: 100px;">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Pain Relief Medication</td>
+                                                    <td class="text-center">1</td>
+                                                    <td class="text-end">$15.99</td>
+                                                    <td class="text-end fw-bold">$15.99</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>First Aid Kit</td>
+                                                    <td class="text-center">1</td>
+                                                    <td class="text-end">$22.99</td>
+                                                    <td class="text-end fw-bold">$22.99</td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="3" class="text-end fw-bold">Total:</td>
+                                                    <td class="text-end fw-bold">$38.98</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="tab-pane fade" id="prescriptions" role="tabpanel" aria-labelledby="prescriptions-tab">
@@ -266,6 +397,7 @@
     <script src="/js/auth.js"></script>
     <script src="/js/app.js"></script>
     <script src="/js/fixed-patient.js"></script>
+    <script src="/js/final-orders-fix.js"></script>
     <script>
         feather.replace();
         
