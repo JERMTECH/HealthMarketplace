@@ -109,8 +109,8 @@ function loadAllClinics() {
         </div>
     `;
     
-    // Fetch all clinics
-    fetch('/api/clinics')
+    // Use the all clinics endpoint
+    fetch('/api/clinics/all')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);

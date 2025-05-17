@@ -18,8 +18,8 @@ from app.auth import get_current_active_user
 router = APIRouter()
 
 # Get all clinics
-@router.get("/", response_model=List[ClinicResponse])
-async def get_clinics(db: Session = Depends(get_db)):
+@router.get("/all", response_model=List[ClinicResponse])
+async def get_all_clinics(db: Session = Depends(get_db)):
     clinics = db.query(Clinic).all()
     result = []
     

@@ -23,8 +23,8 @@ from app.auth import get_current_active_user
 router = APIRouter()
 
 # Get all products
-@router.get("/", response_model=List[ProductResponse])
-async def get_products(
+@router.get("/all", response_model=List[ProductResponse])
+async def get_all_products(
     category: str = None,
     db: Session = Depends(get_db)
 ):
