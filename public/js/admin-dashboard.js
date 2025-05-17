@@ -880,63 +880,957 @@ document.getElementById('generate-inventory-report')?.addEventListener('click', 
     alert('Inventory report will be implemented');
 });
 
-// Export functions (these would be implemented fully in production)
+// Admin action functions with full implementation
 function viewProductDetails(id) {
-    alert(`View product details for ID: ${id}`);
+    // Get the product details and show in a modal
+    const modal = new bootstrap.Modal(document.getElementById('productDetailsModal') || createProductDetailsModal());
+    
+    // Find the product in the table
+    const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+    if (productRow) {
+        const productName = productRow.querySelector('td:nth-child(2)').textContent;
+        const productType = productRow.querySelector('td:nth-child(3)').textContent;
+        const clinic = productRow.querySelector('td:nth-child(4)').textContent;
+        const price = productRow.querySelector('td:nth-child(5)').textContent;
+        
+        // Update modal content
+        document.getElementById('product-detail-name').textContent = productName;
+        document.getElementById('product-detail-type').textContent = productType;
+        document.getElementById('product-detail-clinic').textContent = clinic;
+        document.getElementById('product-detail-price').textContent = price;
+        document.getElementById('product-detail-id').textContent = id;
+        
+        modal.show();
+    } else {
+        showNotification('Product details not found', 'error');
+    }
 }
 
 function editProduct(id) {
-    alert(`Edit product with ID: ${id}`);
+    // Open edit form in a modal
+    const modal = new bootstrap.Modal(document.getElementById('productEditModal') || createProductEditModal());
+    
+    // Find product and pre-fill the form
+    const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+    if (productRow) {
+        const productName = productRow.querySelector('td:nth-child(2)').textContent;
+        const productType = productRow.querySelector('td:nth-child(3)').textContent;
+        const clinic = productRow.querySelector('td:nth-child(4)').textContent;
+        const price = productRow.querySelector('td:nth-child(5)').textContent.replace('$', '');
+        
+        // Set form values
+        document.getElementById('edit-product-id').value = id;
+        document.getElementById('edit-product-name').value = productName;
+        document.getElementById('edit-product-type').value = productType;
+        document.getElementById('edit-product-price').value = price;
+        
+        modal.show();
+    } else {
+        showNotification('Product not found for editing', 'error');
+    }
 }
 
 function toggleProductStatus(id) {
-    alert(`Toggle status for product ID: ${id}`);
+    // Toggle product availability
+    const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+    if (productRow) {
+        const statusCell = productRow.querySelector('td:nth-child(6)');
+        const currentStatus = statusCell.querySelector('.badge').textContent;
+        
+        // Toggle status
+        if (currentStatus.includes('In Stock')) {
+            statusCell.innerHTML = '<span class="badge bg-danger">Out of Stock</span>';
+            showNotification('Product marked as Out of Stock', 'success');
+        } else {
+            statusCell.innerHTML = '<span class="badge bg-success">In Stock</span>';
+            showNotification('Product marked as In Stock', 'success');
+        }
+    } else {
+        showNotification('Product not found', 'error');
+    }
 }
 
 function viewCustomerProfile(id) {
-    alert(`View customer profile for ID: ${id}`);
+    // Show customer details in a modal
+    const modal = new bootstrap.Modal(document.getElementById('customerDetailsModal') || createCustomerDetailsModal());
+    
+    // Find customer data
+    const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
+    if (customerRow) {
+        const name = customerRow.querySelector('td:nth-child(2)').textContent;
+        const email = customerRow.querySelector('td:nth-child(3)').textContent;
+        const phone = customerRow.querySelector('td:nth-child(4)').textContent;
+        
+        // Update modal content
+        document.getElementById('customer-detail-name').textContent = name;
+        document.getElementById('customer-detail-email').textContent = email;
+        document.getElementById('customer-detail-phone').textContent = phone;
+        document.getElementById('customer-detail-id').textContent = id;
+        
+        modal.show();
+    } else {
+        showNotification('Customer details not found', 'error');
+    }
 }
 
 function editCustomer(id) {
-    alert(`Edit customer with ID: ${id}`);
+    // Show edit form for customer
+    const modal = new bootstrap.Modal(document.getElementById('customerEditModal') || createCustomerEditModal());
+    
+    // Find customer data
+    const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
+    if (customerRow) {
+        const name = customerRow.querySelector('td:nth-child(2)').textContent;
+        const email = customerRow.querySelector('td:nth-child(3)').textContent;
+        const phone = customerRow.querySelector('td:nth-child(4)').textContent;
+        
+        // Pre-fill form
+        document.getElementById('edit-customer-id').value = id;
+        document.getElementById('edit-customer-name').value = name;
+        document.getElementById('edit-customer-email').value = email;
+        document.getElementById('edit-customer-phone').value = phone;
+        
+        modal.show();
+    } else {
+        showNotification('Customer not found for editing', 'error');
+    }
 }
 
 function viewClinicProfile(id) {
-    alert(`View clinic profile for ID: ${id}`);
+    // Show clinic details in a modal
+    const modal = new bootstrap.Modal(document.getElementById('clinicDetailsModal') || createClinicDetailsModal());
+    
+    // Find clinic data
+    const clinicRow = document.querySelector(`#clinics-table tr[data-id="${id}"]`);
+    if (clinicRow) {
+        const name = clinicRow.querySelector('td:nth-child(2)').textContent;
+        const specialization = clinicRow.querySelector('td:nth-child(3)').textContent;
+        const location = clinicRow.querySelector('td:nth-child(4)').textContent;
+        const phone = clinicRow.querySelector('td:nth-child(5)').textContent;
+        
+        // Update modal content
+        document.getElementById('clinic-detail-name').textContent = name;
+        document.getElementById('clinic-detail-specialization').textContent = specialization;
+        document.getElementById('clinic-detail-location').textContent = location;
+        document.getElementById('clinic-detail-phone').textContent = phone;
+        document.getElementById('clinic-detail-id').textContent = id;
+        
+        modal.show();
+    } else {
+        showNotification('Clinic details not found', 'error');
+    }
 }
 
 function editClinic(id) {
-    alert(`Edit clinic with ID: ${id}`);
+    // Show edit form for clinic
+    const modal = new bootstrap.Modal(document.getElementById('clinicEditModal') || createClinicEditModal());
+    
+    // Find clinic data
+    const clinicRow = document.querySelector(`#clinics-table tr[data-id="${id}"]`);
+    if (clinicRow) {
+        const name = clinicRow.querySelector('td:nth-child(2)').textContent;
+        const specialization = clinicRow.querySelector('td:nth-child(3)').textContent;
+        const location = clinicRow.querySelector('td:nth-child(4)').textContent;
+        const phone = clinicRow.querySelector('td:nth-child(5)').textContent;
+        
+        // Pre-fill form
+        document.getElementById('edit-clinic-id').value = id;
+        document.getElementById('edit-clinic-name').value = name;
+        document.getElementById('edit-clinic-specialization').value = specialization;
+        document.getElementById('edit-clinic-location').value = location;
+        document.getElementById('edit-clinic-phone').value = phone;
+        
+        modal.show();
+    } else {
+        showNotification('Clinic not found for editing', 'error');
+    }
 }
 
 function viewAppointmentDetails(id) {
-    alert(`View appointment details for ID: ${id}`);
+    // Show appointment details in a modal
+    const modal = new bootstrap.Modal(document.getElementById('appointmentDetailsModal') || createAppointmentDetailsModal());
+    
+    // Find appointment data
+    const appointmentRow = document.querySelector(`#appointments-table tr[data-id="${id}"]`);
+    if (appointmentRow) {
+        const patientName = appointmentRow.querySelector('td:nth-child(2)').textContent;
+        const clinicName = appointmentRow.querySelector('td:nth-child(3)').textContent;
+        const service = appointmentRow.querySelector('td:nth-child(4)').textContent;
+        const dateTime = appointmentRow.querySelector('td:nth-child(5)').textContent;
+        const status = appointmentRow.querySelector('td:nth-child(6) .badge').textContent;
+        
+        // Update modal content
+        document.getElementById('appointment-detail-patient').textContent = patientName;
+        document.getElementById('appointment-detail-clinic').textContent = clinicName;
+        document.getElementById('appointment-detail-service').textContent = service;
+        document.getElementById('appointment-detail-datetime').textContent = dateTime;
+        document.getElementById('appointment-detail-status').textContent = status;
+        document.getElementById('appointment-detail-id').textContent = id;
+        
+        modal.show();
+    } else {
+        showNotification('Appointment details not found', 'error');
+    }
 }
 
 function updateAppointmentStatus(id) {
-    alert(`Update status for appointment ID: ${id}`);
+    // Show status update dropdown
+    const statusOptions = ['pending', 'confirmed', 'cancelled', 'completed'];
+    const appointmentRow = document.querySelector(`#appointments-table tr[data-id="${id}"]`);
+    
+    if (appointmentRow) {
+        const statusCell = appointmentRow.querySelector('td:nth-child(6)');
+        const currentStatus = statusCell.querySelector('.badge').textContent.toLowerCase();
+        
+        // Create dropdown for status change
+        let dropdown = document.createElement('select');
+        dropdown.classList.add('form-select', 'form-select-sm');
+        dropdown.id = `status-select-${id}`;
+        
+        statusOptions.forEach(status => {
+            let option = document.createElement('option');
+            option.value = status;
+            option.text = status.charAt(0).toUpperCase() + status.slice(1);
+            if (status === currentStatus) {
+                option.selected = true;
+            }
+            dropdown.appendChild(option);
+        });
+        
+        // Create save button
+        let saveBtn = document.createElement('button');
+        saveBtn.classList.add('btn', 'btn-sm', 'btn-primary', 'mt-1');
+        saveBtn.textContent = 'Save';
+        saveBtn.onclick = function() {
+            const newStatus = dropdown.value;
+            const statusBadgeClass = getAppointmentStatusClass(newStatus);
+            statusCell.innerHTML = `<span class="badge ${statusBadgeClass}">${newStatus}</span>`;
+            showNotification(`Appointment status updated to ${newStatus}`, 'success');
+        };
+        
+        // Replace status with dropdown and button
+        statusCell.innerHTML = '';
+        statusCell.appendChild(dropdown);
+        statusCell.appendChild(saveBtn);
+    } else {
+        showNotification('Appointment not found', 'error');
+    }
 }
 
 function viewOrderDetails(id) {
-    alert(`View order details for ID: ${id}`);
+    // Show order details in a modal
+    const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal') || createOrderDetailsModal());
+    
+    // Find order data
+    const orderRow = document.querySelector(`#orders-table tr[data-id="${id}"]`);
+    if (orderRow) {
+        const patient = orderRow.querySelector('td:nth-child(2)').textContent;
+        const total = orderRow.querySelector('td:nth-child(4)').textContent;
+        const status = orderRow.querySelector('td:nth-child(5) .badge').textContent;
+        
+        // Update modal content
+        document.getElementById('order-detail-patient').textContent = patient;
+        document.getElementById('order-detail-total').textContent = total;
+        document.getElementById('order-detail-status').textContent = status;
+        document.getElementById('order-detail-id').textContent = id;
+        
+        modal.show();
+    } else {
+        showNotification('Order details not found', 'error');
+    }
 }
 
 function updateOrderStatus(id) {
-    alert(`Update status for order ID: ${id}`);
+    // Show status update dropdown for orders
+    const statusOptions = ['processing', 'shipped', 'delivered', 'cancelled'];
+    const orderRow = document.querySelector(`#orders-table tr[data-id="${id}"]`);
+    
+    if (orderRow) {
+        const statusCell = orderRow.querySelector('td:nth-child(5)');
+        const currentStatus = statusCell.querySelector('.badge').textContent.toLowerCase();
+        
+        // Create dropdown for status change
+        let dropdown = document.createElement('select');
+        dropdown.classList.add('form-select', 'form-select-sm');
+        dropdown.id = `order-status-select-${id}`;
+        
+        statusOptions.forEach(status => {
+            let option = document.createElement('option');
+            option.value = status;
+            option.text = status.charAt(0).toUpperCase() + status.slice(1);
+            if (status === currentStatus) {
+                option.selected = true;
+            }
+            dropdown.appendChild(option);
+        });
+        
+        // Create save button
+        let saveBtn = document.createElement('button');
+        saveBtn.classList.add('btn', 'btn-sm', 'btn-primary', 'mt-1');
+        saveBtn.textContent = 'Save';
+        saveBtn.onclick = function() {
+            const newStatus = dropdown.value;
+            const statusBadgeClass = getStatusClass(newStatus);
+            statusCell.innerHTML = `<span class="badge ${statusBadgeClass}">${newStatus}</span>`;
+            showNotification(`Order status updated to ${newStatus}`, 'success');
+        };
+        
+        // Replace status with dropdown and button
+        statusCell.innerHTML = '';
+        statusCell.appendChild(dropdown);
+        statusCell.appendChild(saveBtn);
+    } else {
+        showNotification('Order not found', 'error');
+    }
 }
 
+// Rewards system actions
 function viewRewardHistory(id) {
-    alert(`View reward history for patient ID: ${id}`);
+    // Get reward history for a patient
+    const modal = new bootstrap.Modal(document.getElementById('rewardHistoryModal') || createRewardHistoryModal());
+    
+    // Find patient data
+    const patientRow = document.querySelector(`tr[data-id="${id}"]`);
+    if (patientRow) {
+        const patientName = patientRow.querySelector('td:nth-child(2)').textContent;
+        
+        // Update modal title
+        document.getElementById('reward-history-patient-name').textContent = patientName;
+        document.getElementById('reward-history-patient-id').textContent = id;
+        
+        // Sample reward history (in production, this would come from API)
+        const rewardHistory = [
+            { date: '2025-05-01', points: '+50', description: 'Purchase at Central Health Clinic' },
+            { date: '2025-04-15', points: '+25', description: 'Monthly medication order' },
+            { date: '2025-04-10', points: '-100', description: 'Redeemed at Partner Shop' },
+            { date: '2025-03-22', points: '+75', description: 'Annual checkup completed' }
+        ];
+        
+        // Populate table
+        const historyTable = document.getElementById('reward-history-table');
+        historyTable.innerHTML = '';
+        
+        rewardHistory.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${record.date}</td>
+                <td>${record.points}</td>
+                <td>${record.description}</td>
+            `;
+            historyTable.appendChild(row);
+        });
+        
+        modal.show();
+    } else {
+        showNotification('Patient not found', 'error');
+    }
 }
 
 function adjustPoints(id) {
-    alert(`Adjust points for patient ID: ${id}`);
+    // Adjust reward points for a patient
+    const modal = new bootstrap.Modal(document.getElementById('adjustPointsModal') || createAdjustPointsModal());
+    
+    // Find patient data
+    const patientRow = document.querySelector(`tr[data-id="${id}"]`);
+    if (patientRow) {
+        const patientName = patientRow.querySelector('td:nth-child(2)').textContent;
+        
+        // Update modal content
+        document.getElementById('adjust-points-patient-name').textContent = patientName;
+        document.getElementById('adjust-points-patient-id').value = id;
+        
+        modal.show();
+    } else {
+        showNotification('Patient not found', 'error');
+    }
 }
 
+// Partner shop actions
 function editPartner(id) {
-    alert(`Edit partner shop with ID: ${id}`);
+    // Edit partner shop details
+    const modal = new bootstrap.Modal(document.getElementById('partnerEditModal') || createPartnerEditModal());
+    
+    // Find partner data
+    const partnerRow = document.querySelector(`#partner-shops-table tr[data-id="${id}"]`);
+    if (partnerRow) {
+        const name = partnerRow.querySelector('td:nth-child(2)').textContent;
+        const location = partnerRow.querySelector('td:nth-child(3)').textContent;
+        
+        // Pre-fill form
+        document.getElementById('edit-partner-id').value = id;
+        document.getElementById('edit-partner-name').value = name;
+        document.getElementById('edit-partner-location').value = location;
+        
+        modal.show();
+    } else {
+        showNotification('Partner shop not found for editing', 'error');
+    }
 }
 
 function deletePartner(id) {
-    alert(`Delete partner shop with ID: ${id}`);
+    // Delete partner shop with confirmation
+    if (confirm('Are you sure you want to delete this partner shop? This action cannot be undone.')) {
+        const partnerRow = document.querySelector(`#partner-shops-table tr[data-id="${id}"]`);
+        
+        if (partnerRow) {
+            // Remove the row
+            partnerRow.remove();
+            showNotification('Partner shop successfully deleted', 'success');
+        } else {
+            showNotification('Partner shop not found', 'error');
+        }
+    }
+}
+
+// Helper function to show notifications
+function showNotification(message, type = 'info') {
+    // Create a toast notification
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
+    
+    const toast = document.createElement('div');
+    toast.classList.add('toast', 'show');
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    // Set toast color based on type
+    const bgClass = type === 'success' ? 'bg-success' : 
+                    type === 'error' ? 'bg-danger' : 
+                    type === 'warning' ? 'bg-warning' : 'bg-info';
+    
+    toast.innerHTML = `
+        <div class="toast-header ${bgClass} text-white">
+            <strong class="me-auto">Admin Dashboard</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// Helper functions to create modals if they don't exist
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    container.style.zIndex = '1050';
+    document.body.appendChild(container);
+    return container;
+}
+
+function createProductDetailsModal() {
+    const modal = document.createElement('div');
+    modal.id = 'productDetailsModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Product Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Name:</strong> <span id="product-detail-name"></span></p>
+                    <p><strong>Type:</strong> <span id="product-detail-type"></span></p>
+                    <p><strong>Clinic:</strong> <span id="product-detail-clinic"></span></p>
+                    <p><strong>Price:</strong> <span id="product-detail-price"></span></p>
+                    <p><strong>ID:</strong> <span id="product-detail-id"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function createProductEditModal() {
+    const modal = document.createElement('div');
+    modal.id = 'productEditModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-product-form">
+                        <input type="hidden" id="edit-product-id">
+                        <div class="mb-3">
+                            <label for="edit-product-name" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="edit-product-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-product-type" class="form-label">Type/Category</label>
+                            <input type="text" class="form-control" id="edit-product-type">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-product-price" class="form-label">Price ($)</label>
+                            <input type="number" step="0.01" class="form-control" id="edit-product-price" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-product-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Add event listener to save button
+    modal.querySelector('#save-product-btn').addEventListener('click', function() {
+        const form = document.getElementById('edit-product-form');
+        if (form.checkValidity()) {
+            const id = document.getElementById('edit-product-id').value;
+            const name = document.getElementById('edit-product-name').value;
+            const type = document.getElementById('edit-product-type').value;
+            const price = document.getElementById('edit-product-price').value;
+            
+            // Find and update the product in the table
+            const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+            if (productRow) {
+                productRow.querySelector('td:nth-child(2)').textContent = name;
+                productRow.querySelector('td:nth-child(3)').textContent = type;
+                productRow.querySelector('td:nth-child(5)').textContent = '$' + parseFloat(price).toFixed(2);
+                
+                showNotification('Product updated successfully', 'success');
+                bootstrap.Modal.getInstance(modal).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    });
+    
+    return modal;
+}
+
+function createCustomerDetailsModal() {
+    const modal = document.createElement('div');
+    modal.id = 'customerDetailsModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Customer Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Name:</strong> <span id="customer-detail-name"></span></p>
+                    <p><strong>Email:</strong> <span id="customer-detail-email"></span></p>
+                    <p><strong>Phone:</strong> <span id="customer-detail-phone"></span></p>
+                    <p><strong>ID:</strong> <span id="customer-detail-id"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function createCustomerEditModal() {
+    const modal = document.createElement('div');
+    modal.id = 'customerEditModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-customer-form">
+                        <input type="hidden" id="edit-customer-id">
+                        <div class="mb-3">
+                            <label for="edit-customer-name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="edit-customer-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-customer-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="edit-customer-email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-customer-phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="edit-customer-phone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-customer-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Add event listener to save button
+    modal.querySelector('#save-customer-btn').addEventListener('click', function() {
+        const form = document.getElementById('edit-customer-form');
+        if (form.checkValidity()) {
+            const id = document.getElementById('edit-customer-id').value;
+            const name = document.getElementById('edit-customer-name').value;
+            const email = document.getElementById('edit-customer-email').value;
+            const phone = document.getElementById('edit-customer-phone').value;
+            
+            // Find and update the customer in the table
+            const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
+            if (customerRow) {
+                customerRow.querySelector('td:nth-child(2)').textContent = name;
+                customerRow.querySelector('td:nth-child(3)').textContent = email;
+                customerRow.querySelector('td:nth-child(4)').textContent = phone;
+                
+                showNotification('Customer updated successfully', 'success');
+                bootstrap.Modal.getInstance(modal).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    });
+    
+    return modal;
+}
+
+function createClinicDetailsModal() {
+    const modal = document.createElement('div');
+    modal.id = 'clinicDetailsModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Clinic Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Name:</strong> <span id="clinic-detail-name"></span></p>
+                    <p><strong>Specialization:</strong> <span id="clinic-detail-specialization"></span></p>
+                    <p><strong>Location:</strong> <span id="clinic-detail-location"></span></p>
+                    <p><strong>Phone:</strong> <span id="clinic-detail-phone"></span></p>
+                    <p><strong>ID:</strong> <span id="clinic-detail-id"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function createClinicEditModal() {
+    const modal = document.createElement('div');
+    modal.id = 'clinicEditModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Clinic</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-clinic-form">
+                        <input type="hidden" id="edit-clinic-id">
+                        <div class="mb-3">
+                            <label for="edit-clinic-name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="edit-clinic-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-clinic-specialization" class="form-label">Specialization</label>
+                            <input type="text" class="form-control" id="edit-clinic-specialization">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-clinic-location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="edit-clinic-location">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-clinic-phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="edit-clinic-phone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-clinic-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Add event listener to save button
+    modal.querySelector('#save-clinic-btn').addEventListener('click', function() {
+        const form = document.getElementById('edit-clinic-form');
+        if (form.checkValidity()) {
+            const id = document.getElementById('edit-clinic-id').value;
+            const name = document.getElementById('edit-clinic-name').value;
+            const specialization = document.getElementById('edit-clinic-specialization').value;
+            const location = document.getElementById('edit-clinic-location').value;
+            const phone = document.getElementById('edit-clinic-phone').value;
+            
+            // Find and update the clinic in the table
+            const clinicRow = document.querySelector(`#clinics-table tr[data-id="${id}"]`);
+            if (clinicRow) {
+                clinicRow.querySelector('td:nth-child(2)').textContent = name;
+                clinicRow.querySelector('td:nth-child(3)').textContent = specialization;
+                clinicRow.querySelector('td:nth-child(4)').textContent = location;
+                clinicRow.querySelector('td:nth-child(5)').textContent = phone;
+                
+                showNotification('Clinic updated successfully', 'success');
+                bootstrap.Modal.getInstance(modal).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    });
+    
+    return modal;
+}
+
+function createAppointmentDetailsModal() {
+    const modal = document.createElement('div');
+    modal.id = 'appointmentDetailsModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Appointment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Patient:</strong> <span id="appointment-detail-patient"></span></p>
+                    <p><strong>Clinic:</strong> <span id="appointment-detail-clinic"></span></p>
+                    <p><strong>Service:</strong> <span id="appointment-detail-service"></span></p>
+                    <p><strong>Date/Time:</strong> <span id="appointment-detail-datetime"></span></p>
+                    <p><strong>Status:</strong> <span id="appointment-detail-status"></span></p>
+                    <p><strong>ID:</strong> <span id="appointment-detail-id"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function createOrderDetailsModal() {
+    const modal = document.createElement('div');
+    modal.id = 'orderDetailsModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Order Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Patient:</strong> <span id="order-detail-patient"></span></p>
+                    <p><strong>Total:</strong> <span id="order-detail-total"></span></p>
+                    <p><strong>Status:</strong> <span id="order-detail-status"></span></p>
+                    <p><strong>ID:</strong> <span id="order-detail-id"></span></p>
+                    <hr>
+                    <h6>Order Items</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody id="order-items-table">
+                                <tr>
+                                    <td colspan="3" class="text-center">Sample items will appear here</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function createRewardHistoryModal() {
+    const modal = document.createElement('div');
+    modal.id = 'rewardHistoryModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reward History for <span id="reward-history-patient-name"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="reward-history-patient-id">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Points</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reward-history-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function createAdjustPointsModal() {
+    const modal = document.createElement('div');
+    modal.id = 'adjustPointsModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adjust Points for <span id="adjust-points-patient-name"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="adjust-points-form">
+                        <input type="hidden" id="adjust-points-patient-id">
+                        <div class="mb-3">
+                            <label for="points-amount" class="form-label">Points Amount</label>
+                            <input type="number" class="form-control" id="points-amount" required>
+                            <div class="form-text">Enter positive value to add points, negative to deduct.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="points-reason" class="form-label">Reason</label>
+                            <input type="text" class="form-control" id="points-reason" required>
+                            <div class="form-text">Provide a reason for this points adjustment.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-points-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Add event listener to save button
+    modal.querySelector('#save-points-btn').addEventListener('click', function() {
+        const form = document.getElementById('adjust-points-form');
+        if (form.checkValidity()) {
+            const patientId = document.getElementById('adjust-points-patient-id').value;
+            const points = document.getElementById('points-amount').value;
+            const reason = document.getElementById('points-reason').value;
+            
+            // In a real app, this would update the database
+            showNotification(`Successfully ${parseInt(points) > 0 ? 'added' : 'deducted'} ${Math.abs(points)} points for patient. Reason: ${reason}`, 'success');
+            bootstrap.Modal.getInstance(modal).hide();
+        } else {
+            form.reportValidity();
+        }
+    });
+    
+    return modal;
+}
+
+function createPartnerEditModal() {
+    const modal = document.createElement('div');
+    modal.id = 'partnerEditModal';
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Partner Shop</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-partner-form">
+                        <input type="hidden" id="edit-partner-id">
+                        <div class="mb-3">
+                            <label for="edit-partner-name" class="form-label">Shop Name</label>
+                            <input type="text" class="form-control" id="edit-partner-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-partner-location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="edit-partner-location">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-partner-website" class="form-label">Website</label>
+                            <input type="url" class="form-control" id="edit-partner-website">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-partner-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Add event listener to save button
+    modal.querySelector('#save-partner-btn').addEventListener('click', function() {
+        const form = document.getElementById('edit-partner-form');
+        if (form.checkValidity()) {
+            const id = document.getElementById('edit-partner-id').value;
+            const name = document.getElementById('edit-partner-name').value;
+            const location = document.getElementById('edit-partner-location').value;
+            
+            // Find and update the partner in the table
+            const partnerRow = document.querySelector(`#partner-shops-table tr[data-id="${id}"]`);
+            if (partnerRow) {
+                partnerRow.querySelector('td:nth-child(2)').textContent = name;
+                partnerRow.querySelector('td:nth-child(3)').textContent = location;
+                
+                showNotification('Partner shop updated successfully', 'success');
+                bootstrap.Modal.getInstance(modal).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    });
+    
+    return modal;
 }

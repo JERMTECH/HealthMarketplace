@@ -52,7 +52,7 @@ async def get_all_appointments(
             "status": "pending",
             "notes": "Follow-up consultation",
             "created_at": "2025-05-16T09:45:00",
-            "updated_at": null,
+            "updated_at": None,
             "clinic_name": "Family Medical Center",
             "service_name": "Specialist Consultation",
             "patient_name": "Emma Johnson"
