@@ -84,7 +84,17 @@ async def login_for_access_token_form(
     
     access_token = create_access_token(data={"sub": user.id})
     
-    return {"access_token": access_token, "token_type": "bearer"}
+    # Return with user data for frontend
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "type": user.type
+        }
+    }
 
 # JSON login endpoint for web/mobile clients
 class LoginData(BaseModel):
