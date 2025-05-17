@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, distinct, desc
 from typing import List, Dict, Any
 import uuid
+from datetime import datetime
 
 from app.database import get_db
 from app.models.users import User
@@ -17,7 +18,8 @@ from app.schemas.product import (
     ProductUpdate,
     ProductCategory,
     OrderCreate,
-    OrderResponse
+    OrderResponse,
+    OrderItemCustomResponse
 )
 from app.auth import get_current_active_user
 
@@ -326,30 +328,31 @@ async def create_order(
         }
         response_items.append(item_dict)
     
-    # Create order response with the correct schema format
-    # Create custom order items with the required 'name' field
-    order_items_with_name = []
+    # Simply create a dictionary matching our response format
+    # This avoids Pydantic validation issues with Column objects
+    custom_items = []
     for item in response_items:
-        order_items_with_name.append(OrderItemCustomResponse(
-            id=item["id"],
-            product_id=item["product_id"],
-            name=item["product_name"] or "Unknown Product",  # Ensure name is never None
-            quantity=item["quantity"],
-            price=item["price"]
-        ))
+        custom_items.append({
+            "id": str(item["id"]),
+            "product_id": str(item["product_id"]),
+            "name": str(item["product_name"] or "Unknown Product"),
+            "quantity": str(item["quantity"]),
+            "price": str(item["price"])
+        })
     
-    # Add required 'date' field as current date string
+    # Current date in the correct format
     current_date = datetime.now().strftime("%Y-%m-%d")
     
-    order_response = OrderResponse(
-        id=order.id,
-        patient_id=order.patient_id,
-        prescription_id=order.prescription_id,
-        total=order.total,
-        status=order.status,
-        points_earned=order.points_earned,
-        date=current_date,  # Add the required date field
-        items=order_items_with_name
-    )
+    # Dictionary that matches OrderResponse model
+    order_response = {
+        "id": str(order.id),
+        "patient_id": str(order.patient_id),
+        "prescription_id": str(order.prescription_id) if order.prescription_id else None,
+        "total": str(order.total),
+        "status": str(order.status),
+        "points_earned": str(order.points_earned),
+        "date": current_date,
+        "items": custom_items
+    }
     
     return order_response
