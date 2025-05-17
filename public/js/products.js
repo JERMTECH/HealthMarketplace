@@ -271,39 +271,15 @@ function addToCart(productId, productName, productPrice, quantity = 1) {
     
     // Ask user if they want to view cart
     if (confirm(`Added "${productName}" to your cart. View cart now?`)) {
-        showCart();
+        // Redirect to dedicated cart page
+        window.location.href = '/pages/cart.html';
     }
 }
 
 // Show cart
 function showCart() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    if (cart.length === 0) {
-        alert('Your cart is empty');
-        return;
-    }
-    
-    // Calculate total
-    const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
-    
-    // Create a simple cart display
-    let cartSummary = "Your Cart Items:\n\n";
-    
-    cart.forEach((item, index) => {
-        const itemTotal = parseFloat(item.price) * parseInt(item.quantity);
-        cartSummary += `${item.name} (${item.quantity} × $${item.price}) = $${itemTotal.toFixed(2)}\n`;
-    });
-    
-    cartSummary += `\n-----------------\nTotal: $${total.toFixed(2)}`;
-    
-    const checkout = confirm(`${cartSummary}\n\nWould you like to checkout now?`);
-    
-    if (checkout) {
-        proceedToCheckout();
-    }
-    
-    return;
+    // Redirect to dedicated cart page
+    window.location.href = '/pages/cart.html';
     
     // Create cart modal if it doesn't exist
     let cartModal = document.getElementById('cart-modal');
