@@ -255,9 +255,14 @@ async function loadPatientOrders() {
             return;
         }
         
-        const response = await authorizedFetch(`/api/orders/patient/${user.id}`);
+        const response = await authorizedFetch(`/api/products/orders/patient/${user.id}`);
         
         if (!response.ok) {
+            // If 404, just show empty orders
+            if (response.status === 404) {
+                displayPatientOrders([]);
+                return;
+            }
             throw new Error('Failed to load orders');
         }
         
@@ -605,6 +610,16 @@ async function loadPatientRewards() {
         const response = await authorizedFetch(`/api/rewards/patient/${user.id}`);
         
         if (!response.ok) {
+            // If 404, just show empty rewards
+            if (response.status === 404) {
+                // Create a default empty rewards object
+                displayPatientRewards({
+                    totalPoints: "0",
+                    history: [],
+                    card: null
+                });
+                return;
+            }
             throw new Error('Failed to load rewards');
         }
         
