@@ -59,6 +59,13 @@ class OrderBase(BaseModel):
 class OrderCreate(OrderBase):
     pass
 
+class OrderItemCustomResponse(BaseModel):
+    id: str
+    product_id: str
+    name: str
+    quantity: str
+    price: str
+
 class OrderResponse(BaseModel):
     id: str
     patient_id: str
@@ -66,9 +73,9 @@ class OrderResponse(BaseModel):
     total: str
     status: str
     points_earned: str
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-    items: List[OrderItemResponse]
+    date: str
+    items: List[OrderItemCustomResponse]
+    clinic_name: Optional[str] = None
 
     class Config:
         orm_mode = True

@@ -9,6 +9,7 @@ from app.models.users import User
 from app.models.products import Product, Order, OrderItem
 from app.models.clinics import Clinic
 from app.models.patients import Patient
+from app.models.prescriptions import Prescription
 from app.models.rewards import RewardPoint
 from app.schemas.product import (
     ProductCreate,
@@ -21,6 +22,63 @@ from app.schemas.product import (
 from app.auth import get_current_active_user
 
 router = APIRouter()
+
+# Get patient orders
+@router.get("/orders/patient/{patient_id}", response_model=List[OrderResponse])
+async def get_patient_orders(
+    patient_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Check if user is authorized
+    if current_user.id != patient_id and current_user.type != "clinic":
+        raise HTTPException(status_code=403, detail="Not authorized to view this patient's orders")
+    
+    # Get orders for patient
+    orders = db.query(Order).filter(Order.patient_id == patient_id).all()
+    
+    # Prepare response with additional data
+    order_responses = []
+    for order in orders:
+        # Get order items with product details
+        items = []
+        order_items = db.query(OrderItem).filter(OrderItem.order_id == order.id).all()
+        
+        for item in order_items:
+            product = db.query(Product).filter(Product.id == item.product_id).first()
+            if product:
+                items.append({
+                    "id": item.id,
+                    "product_id": item.product_id,
+                    "name": product.name,
+                    "quantity": item.quantity,
+                    "price": item.price
+                })
+        
+        # Get clinic name if available
+        clinic_name = None
+        if order.prescription_id:
+            prescription = db.query(Prescription).filter(Prescription.id == order.prescription_id).first()
+            if prescription and prescription.clinic_id:
+                clinic = db.query(Clinic).join(User).filter(Clinic.id == prescription.clinic_id).first()
+                if clinic and clinic.user:
+                    clinic_name = clinic.user.name
+        
+        # Format order with items and additional data
+        order_response = {
+            "id": order.id,
+            "patient_id": order.patient_id,
+            "total": order.total,
+            "status": order.status,
+            "date": order.created_at.isoformat(),
+            "points_earned": order.points_earned,
+            "items": items,
+            "clinic_name": clinic_name
+        }
+        
+        order_responses.append(order_response)
+    
+    return order_responses
 
 # Get all products
 @router.get("/all", response_model=List[ProductResponse])
