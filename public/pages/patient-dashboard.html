@@ -409,162 +409,219 @@
                 newOrdersContainer.id = 'fixed-orders-container';
                 newOrdersContainer.className = 'container-fluid px-0';
                 
-                // Add the orders content with clean, proper styling
+                // Add the orders content with clean, proper styling - horizontal cards layout
                 newOrdersContainer.innerHTML = `
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card mb-4 shadow-sm border-0">
-                                <div class="card-header bg-white d-flex justify-content-between align-items-center" style="border-left: 5px solid #28a745;">
-                                    <div>
-                                        <h5 class="mb-0">Order #12345678</h5>
-                                        <span class="text-muted">May 15, 2025 at 10:30 AM</span>
+                    <!-- Horizontal layout for order cards -->
+                    <div class="row">
+                        <!-- Orders header -->
+                        <div class="col-12 mb-4">
+                            <h3 class="mb-0">Recent Orders</h3>
+                            <p class="text-muted">Your recent medication and product orders</p>
+                        </div>
+                        
+                        <!-- First row of order cards - horizontal layout -->
+                        <div class="col-12 mb-4">
+                            <div class="row">
+                                <!-- Order 1 -->
+                                <div class="col-md-6 col-lg-3 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #28a745 !important;">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="fw-bold mb-0">Order #66691</h6>
+                                                <span class="badge bg-success px-2 py-1">Delivered</span>
+                                            </div>
+                                            <p class="text-muted small mb-2">May 17, 2025 at 12:21 PM</p>
+                                            
+                                            <hr class="my-2">
+                                            
+                                            <p class="mb-1 small"><strong>Clinic:</strong> HealthPlus</p>
+                                            
+                                            <div class="mt-2">
+                                                <p class="mb-1 small"><strong>Items:</strong></p>
+                                                <div class="rounded bg-light p-2 mb-2">
+                                                    <p class="mb-1 small">Vitamin C Supplements</p>
+                                                    <p class="mb-0 small text-muted">Qty: 1</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between mt-3">
+                                                <p class="mb-0 fw-bold">Total:</p>
+                                                <p class="mb-0 fw-bold">$19.99</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span class="badge bg-success px-3 py-2">Delivered</span>
                                 </div>
-                                <div class="card-body">
-                                    <div class="progress mb-3" style="height: 8px;">
-                                        <div class="progress-bar bg-success" style="width: 100%"></div>
-                                    </div>
-                                    
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
-                                            <h6><i data-feather="info" class="feather-sm me-2"></i> Order Information</h6>
-                                            <p class="mb-1"><strong>Status:</strong> Delivered</p>
-                                            <p class="mb-1"><strong>Points Earned:</strong> 50</p>
-                                            <p class="mb-1"><strong>Delivery Date:</strong> May 17, 2025</p>
+                                
+                                <!-- Order 2 -->
+                                <div class="col-md-6 col-lg-3 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #ffc107 !important;">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="fw-bold mb-0">Order #a7e0d</h6>
+                                                <span class="badge bg-warning px-2 py-1">Processing</span>
+                                            </div>
+                                            <p class="text-muted small mb-2">May 17, 2025 at 12:15 PM</p>
+                                            
+                                            <hr class="my-2">
+                                            
+                                            <p class="mb-1 small"><strong>Clinic:</strong> MediCare</p>
+                                            
+                                            <div class="mt-2">
+                                                <p class="mb-1 small"><strong>Items:</strong></p>
+                                                <div class="rounded bg-light p-2 mb-2">
+                                                    <p class="mb-1 small">Digital Thermometer</p>
+                                                    <p class="mb-0 small text-muted">Qty: 1</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between mt-3">
+                                                <p class="mb-0 fw-bold">Total:</p>
+                                                <p class="mb-0 fw-bold">$24.50</p>
+                                            </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <h6><i data-feather="map-pin" class="feather-sm me-2"></i> Shipping Information</h6>
-                                            <p class="mb-1"><strong>Address:</strong> 123 Main St, Anytown</p>
-                                            <p class="mb-1"><strong>Provider:</strong> MediCare Express</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Order 3 -->
+                                <div class="col-md-6 col-lg-3 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #28a745 !important;">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="fw-bold mb-0">Order #47d46</h6>
+                                                <span class="badge bg-success px-2 py-1">Delivered</span>
+                                            </div>
+                                            <p class="text-muted small mb-2">May 17, 2025 at 12:14 PM</p>
+                                            
+                                            <hr class="my-2">
+                                            
+                                            <p class="mb-1 small"><strong>Clinic:</strong> CityHealth</p>
+                                            
+                                            <div class="mt-2">
+                                                <p class="mb-1 small"><strong>Items:</strong></p>
+                                                <div class="rounded bg-light p-2 mb-2">
+                                                    <p class="mb-1 small">Vitamin D Supplements</p>
+                                                    <p class="mb-0 small text-muted">Qty: 1</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between mt-3">
+                                                <p class="mb-0 fw-bold">Total:</p>
+                                                <p class="mb-0 fw-bold">$15.99</p>
+                                            </div>
                                         </div>
                                     </div>
-                                    
-                                    <h6 class="border-bottom pb-2 mb-3"><i data-feather="package" class="feather-sm me-2"></i> Order Items</h6>
-                                    
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Product</th>
-                                                    <th class="text-center">Quantity</th>
-                                                    <th class="text-end">Price</th>
-                                                    <th class="text-end">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <span class="fw-bold">Blood Pressure Monitor</span>
-                                                        <div class="text-muted small">Digital - Automatic</div>
-                                                    </td>
-                                                    <td class="text-center">1</td>
-                                                    <td class="text-end">$45.99</td>
-                                                    <td class="text-end fw-bold">$45.99</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span class="fw-bold">Vitamin D Supplements</span>
-                                                        <div class="text-muted small">1000 IU - 60 tablets</div>
-                                                    </td>
-                                                    <td class="text-center">2</td>
-                                                    <td class="text-end">$12.50</td>
-                                                    <td class="text-end fw-bold">$25.00</td>
-                                                </tr>
-                                            </tbody>
-                                            <tfoot class="table-light">
-                                                <tr>
-                                                    <td colspan="3" class="text-end fw-bold">Subtotal:</td>
-                                                    <td class="text-end fw-bold">$70.99</td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="3" class="text-end fw-bold">Shipping:</td>
-                                                    <td class="text-end fw-bold">$5.00</td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="3" class="text-end fw-bold">Total:</td>
-                                                    <td class="text-end fw-bold">$75.99</td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
+                                </div>
+                                
+                                <!-- Order 4 -->
+                                <div class="col-md-6 col-lg-3 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #28a745 !important;">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="fw-bold mb-0">Order #133c3</h6>
+                                                <span class="badge bg-success px-2 py-1">Delivered</span>
+                                            </div>
+                                            <p class="text-muted small mb-2">May 17, 2025 at 12:12 PM</p>
+                                            
+                                            <hr class="my-2">
+                                            
+                                            <p class="mb-1 small"><strong>Clinic:</strong> WellCare</p>
+                                            
+                                            <div class="mt-2">
+                                                <p class="mb-1 small"><strong>Items:</strong></p>
+                                                <div class="rounded bg-light p-2 mb-2">
+                                                    <p class="mb-1 small">Vitamin C Supplements</p>
+                                                    <p class="mb-0 small text-muted">Qty: 1</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between mt-3">
+                                                <p class="mb-0 fw-bold">Total:</p>
+                                                <p class="mb-0 fw-bold">$18.75</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="card mb-4 shadow-sm border-0">
-                                <div class="card-header bg-white d-flex justify-content-between align-items-center" style="border-left: 5px solid #ffc107;">
-                                    <div>
-                                        <h5 class="mb-0">Order #87654321</h5>
-                                        <span class="text-muted">May 17, 2025 at 09:45 AM</span>
+                        </div>
+                        
+                        <!-- Second row of order cards -->
+                        <div class="col-12">
+                            <div class="row">
+                                <!-- Order 5 -->
+                                <div class="col-md-6 col-lg-3 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #17a2b8 !important;">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="fw-bold mb-0">Order #9539e</h6>
+                                                <span class="badge bg-info px-2 py-1">Shipping</span>
+                                            </div>
+                                            <p class="text-muted small mb-2">May 17, 2025 at 12:11 PM</p>
+                                            
+                                            <hr class="my-2">
+                                            
+                                            <p class="mb-1 small"><strong>Clinic:</strong> MediPlus</p>
+                                            
+                                            <div class="mt-2">
+                                                <p class="mb-1 small"><strong>Items:</strong></p>
+                                                <div class="rounded bg-light p-2 mb-2">
+                                                    <p class="mb-1 small">Omega-3 Fish Oil</p>
+                                                    <p class="mb-0 small text-muted">Qty: 1</p>
+                                                </div>
+                                                <div class="rounded bg-light p-2 mb-2">
+                                                    <p class="mb-1 small">Vitamin C Supplements</p>
+                                                    <p class="mb-0 small text-muted">Qty: 2</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between mt-3">
+                                                <p class="mb-0 fw-bold">Total:</p>
+                                                <p class="mb-0 fw-bold">$48.97</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span class="badge bg-warning px-3 py-2">Processing</span>
                                 </div>
-                                <div class="card-body">
-                                    <div class="progress mb-3" style="height: 8px;">
-                                        <div class="progress-bar bg-warning" style="width: 25%"></div>
-                                    </div>
-                                    
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
-                                            <h6><i data-feather="info" class="feather-sm me-2"></i> Order Information</h6>
-                                            <p class="mb-1"><strong>Status:</strong> Processing</p>
-                                            <p class="mb-1"><strong>Points to Earn:</strong> 30</p>
-                                            <p class="mb-1"><strong>Est. Delivery:</strong> May 20, 2025</p>
+                                
+                                <!-- Order 6 -->
+                                <div class="col-md-6 col-lg-3 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #ffc107 !important;">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="fw-bold mb-0">Order #63ecb</h6>
+                                                <span class="badge bg-warning px-2 py-1">Processing</span>
+                                            </div>
+                                            <p class="text-muted small mb-2">May 17, 2025 at 12:09 PM</p>
+                                            
+                                            <hr class="my-2">
+                                            
+                                            <p class="mb-1 small"><strong>Clinic:</strong> HealthFirst</p>
+                                            
+                                            <div class="mt-2">
+                                                <p class="mb-1 small"><strong>Items:</strong></p>
+                                                <div class="rounded bg-light p-2 mb-2">
+                                                    <p class="mb-1 small">Omega-3 Fish Oil</p>
+                                                    <p class="mb-0 small text-muted">Qty: 1</p>
+                                                </div>
+                                                <div class="rounded bg-light p-2 mb-2">
+                                                    <p class="mb-1 small">Vitamin C Supplements</p>
+                                                    <p class="mb-0 small text-muted">Qty: 1</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between mt-3">
+                                                <p class="mb-0 fw-bold">Total:</p>
+                                                <p class="mb-0 fw-bold">$35.98</p>
+                                            </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <h6><i data-feather="map-pin" class="feather-sm me-2"></i> Shipping Information</h6>
-                                            <p class="mb-1"><strong>Address:</strong> 123 Main St, Anytown</p>
-                                            <p class="mb-1"><strong>Provider:</strong> HealthPlus Pharmacy</p>
-                                        </div>
                                     </div>
-                                    
-                                    <h6 class="border-bottom pb-2 mb-3"><i data-feather="package" class="feather-sm me-2"></i> Order Items</h6>
-                                    
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Product</th>
-                                                    <th class="text-center">Quantity</th>
-                                                    <th class="text-end">Price</th>
-                                                    <th class="text-end">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <span class="fw-bold">Omega-3 Fish Oil</span>
-                                                        <div class="text-muted small">1000mg - 90 softgels</div>
-                                                    </td>
-                                                    <td class="text-center">1</td>
-                                                    <td class="text-end">$22.99</td>
-                                                    <td class="text-end fw-bold">$22.99</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span class="fw-bold">Vitamin C Supplements</span>
-                                                        <div class="text-muted small">500mg - 100 tablets</div>
-                                                    </td>
-                                                    <td class="text-center">1</td>
-                                                    <td class="text-end">$12.99</td>
-                                                    <td class="text-end fw-bold">$12.99</td>
-                                                </tr>
-                                            </tbody>
-                                            <tfoot class="table-light">
-                                                <tr>
-                                                    <td colspan="3" class="text-end fw-bold">Subtotal:</td>
-                                                    <td class="text-end fw-bold">$35.98</td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="3" class="text-end fw-bold">Shipping:</td>
-                                                    <td class="text-end fw-bold">$0.00</td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="3" class="text-end fw-bold">Total:</td>
-                                                    <td class="text-end fw-bold">$35.98</td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
+                                </div>
+                                
+                                <!-- View more orders button -->
+                                <div class="col-md-6 col-lg-6 mb-4 d-flex align-items-center justify-content-center">
+                                    <div class="text-center">
+                                        <button class="btn btn-primary btn-lg">
+                                            <i data-feather="list" class="feather-sm me-2"></i> View All Orders
+                                        </button>
+                                        <p class="text-muted mt-2">See your complete order history</p>
                                     </div>
                                 </div>
                             </div>
