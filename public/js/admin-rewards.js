@@ -17,7 +17,10 @@ document.addEventListener('DOMContentLoaded', function() {
 // Check if user has admin access
 function checkAdminAccess() {
     const user = getUser();
-    if (!user || user.type !== 'admin') {
+    // More permissive check for admin types
+    const adminTypes = ['admin', 'administrator', 'system'];
+    if (!user || !adminTypes.includes(user.type)) {
+        console.log("User type:", user ? user.type : "not logged in");
         window.location.href = '/pages/login.html?returnUrl=' + encodeURIComponent(window.location.pathname);
     }
 }
