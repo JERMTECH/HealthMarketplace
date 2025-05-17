@@ -193,10 +193,10 @@ function initializeShoppingCart() {
     // Update cart badge
     updateCartBadge();
     
-    // Set up cart icon click handler
-    const cartIcon = document.getElementById('cart-icon');
-    if (cartIcon) {
-        cartIcon.addEventListener('click', showCart);
+    // Set up cart button click handler
+    const viewCartBtn = document.getElementById('view-cart-btn');
+    if (viewCartBtn) {
+        viewCartBtn.addEventListener('click', showCart);
     }
 }
 
