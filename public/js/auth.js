@@ -120,7 +120,7 @@ async function register(userData) {
         const data = await response.json();
         
         // Save token and user data
-        saveUserData(data.token, data.user);
+        saveUserData(data.access_token, data.user);
         
         // Update UI
         updateNavigation(data.user);
