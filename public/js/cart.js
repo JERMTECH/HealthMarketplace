@@ -193,17 +193,26 @@ function proceedToCheckout() {
     // Calculate total
     const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
     
-    // Create order
-    fetch('/api/products/order', {
-        method: 'POST',
+    // Get user information
+    fetch('/api/auth/check', {
         headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            items: orderItems,
-            total: total.toString()
-        })
+        }
+    })
+    .then(response => response.json())
+    .then(userData => {
+        // Create order
+        return fetch('/api/products/order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                patient_id: userData.id,
+                items: orderItems
+            })
+        });
     })
     .then(response => {
         if (!response.ok) {
