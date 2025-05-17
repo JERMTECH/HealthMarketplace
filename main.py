@@ -12,6 +12,7 @@ from app.routes import auth, clinics, patients, appointments, products
 # These routers are created now
 from app.routes.prescriptions import router as prescriptions_router
 from app.routes.rewards import router as rewards_router
+from app.routes.reward_config import router as reward_config_router
 # Import sample data creation function
 from app.sample_data import create_initial_data
 
@@ -50,6 +51,7 @@ async def get_patient_orders_alias(patient_id: str, current_user = Depends(get_c
     return await get_patient_orders(patient_id=patient_id, db=db, current_user=current_user)
 app.include_router(prescriptions_router, prefix="/api/prescriptions", tags=["Prescriptions"])
 app.include_router(rewards_router, prefix="/api/rewards", tags=["Rewards"])
+app.include_router(reward_config_router, prefix="/api/rewards/config", tags=["Reward Configuration"])
 
 # Create sample data
 @app.on_event("startup")
