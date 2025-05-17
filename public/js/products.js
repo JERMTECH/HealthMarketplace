@@ -208,11 +208,12 @@ function initializeShoppingCart() {
 function updateCartBadge() {
     const cartBadge = document.getElementById('cart-badge');
     const cartCount = document.getElementById('cart-count');
+    const navCartCount = document.getElementById('nav-cart-count');
     
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const itemCount = cart.reduce((total, item) => total + parseInt(item.quantity), 0);
     
-    // Update both cart indicators if they exist
+    // Update all cart indicators if they exist
     if (cartBadge) {
         cartBadge.textContent = itemCount;
         cartBadge.style.display = itemCount > 0 ? 'inline-block' : 'none';
@@ -220,6 +221,11 @@ function updateCartBadge() {
     
     if (cartCount) {
         cartCount.textContent = itemCount;
+    }
+    
+    if (navCartCount) {
+        navCartCount.textContent = itemCount;
+        navCartCount.style.display = itemCount > 0 ? 'inline-block' : 'none';
     }
 }
 
