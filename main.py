@@ -60,8 +60,11 @@ async def startup_event():
     # Create admin user on startup
     from app.updates.add_admin_user import add_admin_user
     from app.database import get_db
+    from app.auth_fix import fix_admin_user_type
     db = next(get_db())
     add_admin_user(db)
+    # Fix admin user type if needed
+    fix_admin_user_type()
 
 @app.get("/api/health")
 async def health_check():

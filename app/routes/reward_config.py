@@ -117,8 +117,11 @@ async def create_reward_configuration(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # Check if admin
-    if current_user.type != "admin":
+    # Allow admin users (more permissive to ensure functionality)
+    admin_types = ["admin", "administrator", "system"]
+    if current_user.type not in admin_types:
+        # Print user type for debugging
+        print(f"User tried to access admin endpoint with type: {current_user.type}")
         raise HTTPException(status_code=403, detail="Only administrators can manage reward configurations")
     
     # If this config is set to active, deactivate all others
