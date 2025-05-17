@@ -195,6 +195,15 @@ function isPatient() {
     return user && user.type === 'patient';
 }
 
+// Check if user is an admin
+function isAdmin() {
+    const user = getUser();
+    // Check case insensitively for various admin types
+    if (!user || !user.type) return false;
+    const adminTypes = ['admin', 'administrator', 'system'];
+    return adminTypes.some(type => user.type.toLowerCase() === type.toLowerCase());
+}
+
 // Add authorization header to fetch requests
 function authorizedFetch(url, options = {}) {
     const token = getToken();
