@@ -196,7 +196,7 @@ async def delete_product(
     
     return None
 
-# Create an order
+# Create an order with simplified validation
 @router.post("/order", response_model=OrderResponse)
 async def create_order(
     order_data: dict,
@@ -248,19 +248,16 @@ async def create_order(
                 item_total = float(product.price)
                 total += item_total
     
-    # Create order with a unique ID
+    # Simplify order creation for maximum reliability
+    # Generate a unique ID for the new order
     order_id = str(uuid.uuid4())
     
-    # Handle prescription ID if present
-    prescription_id = None
-    if isinstance(order_data, dict) and "prescription_id" in order_data:
-        prescription_id = order_data["prescription_id"]
-    
-    # Create the order record
+    # Create the order record with just the essential fields
+    # Always use authenticated user's ID and handle None values
     order = Order(
         id=order_id,
-        patient_id=patient_id,  # Use the secure patient_id we defined above
-        prescription_id=prescription_id,
+        patient_id=current_user.id,  # Use the authenticated user ID
+        prescription_id=None,  # No prescription needed for basic orders
         total=str(total),
         status="processing",
         points_earned=str(int(total * 10))  # 10 points per dollar

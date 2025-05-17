@@ -183,51 +183,32 @@ function proceedToCheckout() {
         return;
     }
     
-    // Prepare order data
-    const orderItems = cart.map(item => ({
-        product_id: item.id,
-        quantity: item.quantity,
-        price: item.price
-    }));
+    // Show loading message
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.textContent = 'Processing...';
+    }
     
-    // Calculate total
-    const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
+    // Directly prepare order data without patient_id
+    // The server will extract the user ID from the token
+    const orderData = {
+        items: cart.map(item => ({
+            product_id: item.id,
+            quantity: item.quantity.toString()
+        }))
+    };
     
-    // Get user information
-    fetch('/api/auth/check', {
+    console.log("Order data:", JSON.stringify(orderData));
+    
+    // Create order - much simpler approach with better error handling
+    fetch('/api/products/order', {
+        method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Not authenticated');
-        }
-        return response.json();
-    })
-    .then(userData => {
-        console.log("Creating order with user ID:", userData.id);
-        
-        // Create a simplified order to avoid validation errors
-        const orderData = {
-            patient_id: userData.id,
-            items: cart.map(item => ({
-                product_id: item.id,
-                quantity: item.quantity.toString()
-            }))
-        };
-        
-        console.log("Order data:", JSON.stringify(orderData));
-        
-        // Create order
-        return fetch('/api/products/order', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(orderData)
-        });
+        },
+        body: JSON.stringify(orderData)
     })
     .then(response => {
         if (!response.ok) {
