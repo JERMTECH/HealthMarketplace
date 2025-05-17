@@ -76,16 +76,12 @@ const AuthAPI = {
      * @returns {Promise} - Promise with auth token
      */
     login: async (email, password) => {
-        const formData = new URLSearchParams();
-        formData.append('username', email);
-        formData.append('password', password);
-        
         return fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json'
             },
-            body: formData
+            body: JSON.stringify({ email, password })
         }).then(response => {
             if (!response.ok) {
                 throw new Error('Login failed');

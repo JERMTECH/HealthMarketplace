@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 import uuid
 
 from app.database import get_db
@@ -68,9 +69,8 @@ async def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
     
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.post("/login", response_model=Token)
 @router.post("/token", response_model=Token)  # Keep the old endpoint for backwards compatibility
-async def login_for_access_token(
+async def login_for_access_token_form(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -85,6 +85,38 @@ async def login_for_access_token(
     access_token = create_access_token(data={"sub": user.id})
     
     return {"access_token": access_token, "token_type": "bearer"}
+
+# JSON login endpoint for web/mobile clients
+class LoginData(BaseModel):
+    email: str
+    password: str
+
+@router.post("/login", response_model=Token)
+async def login_json(
+    login_data: LoginData,
+    db: Session = Depends(get_db)
+):
+    user = authenticate_user(db, login_data.email, login_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token = create_access_token(data={"sub": user.id})
+    
+    # Return with user data for frontend
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "type": user.type
+        }
+    }
 
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
