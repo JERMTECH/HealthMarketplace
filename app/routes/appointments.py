@@ -20,8 +20,8 @@ from app.auth import get_current_active_user
 router = APIRouter()
 
 # Get all appointments (admin only in a real app)
-@router.get("/", response_model=List[AppointmentResponse])
-async def get_appointments(
+@router.get("/all", response_model=List[AppointmentResponse])
+async def get_all_appointments(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):

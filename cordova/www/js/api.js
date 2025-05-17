@@ -174,7 +174,7 @@ const AppointmentsAPI = {
      * @returns {Promise} - Promise with appointments list
      */
     getAppointments: async () => {
-        return apiCall('/appointments');
+        return apiCall('/appointments/all');
     },
     
     /**
