@@ -34,11 +34,29 @@ async def get_patient(
     if current_user.id != patient_id and current_user.type != "clinic":
         raise HTTPException(status_code=403, detail="Not authorized to view this patient")
     
+    # Query patient with user data joined
     patient = db.query(Patient).filter(Patient.id == patient_id).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
     
-    return patient
+    # Get user data to include name and email
+    user = db.query(User).filter(User.id == patient_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Create a combined response with data from both models
+    response_data = {
+        "id": patient.id,
+        "name": user.name,
+        "email": user.email,
+        "phone": patient.phone,
+        "address": patient.address,
+        "date_of_birth": patient.date_of_birth,
+        "created_at": patient.created_at,
+        "updated_at": patient.updated_at
+    }
+    
+    return response_data
 
 # Update patient
 @router.put("/{patient_id}", response_model=PatientResponse)
