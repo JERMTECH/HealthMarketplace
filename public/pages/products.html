@@ -44,10 +44,17 @@
                         <a class="nav-link" href="#" id="logout-link">Logout</a>
                     </li>
                 </ul>
-                <a href="/pages/cart.html" class="btn btn-success ms-2">
+                <a href="/pages/cart.html" class="btn btn-danger ms-2" style="font-size: 1.2rem; font-weight: bold; padding: 10px 20px; border: 3px solid #ff0000; animation: pulse 2s infinite;">
                     <i data-feather="shopping-cart" class="me-1"></i>
-                    View Cart <span id="nav-cart-count" class="badge bg-light text-dark ms-1">0</span>
+                    VIEW CART <span id="nav-cart-count" class="badge bg-warning text-dark ms-1" style="font-size: 1rem;">0</span>
                 </a>
+                <style>
+                    @keyframes pulse {
+                        0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+                        70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+                        100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+                    }
+                </style>
             </div>
         </div>
     </nav>
