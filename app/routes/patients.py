@@ -69,7 +69,8 @@ async def get_patients(
                 "address": "123 Main St, Anytown, CA",
                 "date_of_birth": "1980-05-15",
                 "created_at": "2025-01-10T09:30:00",
-                "updated_at": "2025-04-05T14:45:00"
+                "updated_at": "2025-04-05T14:45:00",
+                "is_active": True
             },
             {
                 "id": "pat-002",
@@ -79,7 +80,8 @@ async def get_patients(
                 "address": "456 Oak Ave, Somewhere, NY",
                 "date_of_birth": "1992-08-22",
                 "created_at": "2025-02-15T10:15:00",
-                "updated_at": "2025-03-20T11:30:00"
+                "updated_at": "2025-03-20T11:30:00",
+                "is_active": True
             },
             {
                 "id": "pat-003",
@@ -89,7 +91,30 @@ async def get_patients(
                 "address": "789 Pine Rd, Elsewhere, TX",
                 "date_of_birth": "1975-11-03",
                 "created_at": "2025-01-05T08:00:00",
-                "updated_at": "2025-04-10T16:20:00"
+                "updated_at": "2025-04-10T16:20:00",
+                "is_active": True
+            },
+            {
+                "id": "pat-004",
+                "name": "Sarah Wilson",
+                "email": "sarah.w@example.com",
+                "phone": "555-222-3333",
+                "address": "101 Maple Dr, Anystate, FL",
+                "date_of_birth": "1988-04-17",
+                "created_at": "2025-03-05T14:45:00",
+                "updated_at": "2025-04-15T09:30:00",
+                "is_active": False
+            },
+            {
+                "id": "pat-005",
+                "name": "David Garcia",
+                "email": "david.g@example.com",
+                "phone": "555-444-7777",
+                "address": "202 Elm St, Somewhere, CA",
+                "date_of_birth": "1965-09-28",
+                "created_at": "2025-02-20T16:15:00",
+                "updated_at": "2025-04-01T11:45:00",
+                "is_active": True
             }
         ]
     

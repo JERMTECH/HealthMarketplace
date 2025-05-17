@@ -475,10 +475,13 @@ async function loadCustomers() {
         customersTable.innerHTML = '<tr><td colspan="7" class="text-center">Loading customers...</td></tr>';
         
         // Get patients data
-        const patientsResponse = await authorizedFetch('/api/patients/all');
-        const patients = await patientsResponse.json();
+        const response = await authorizedFetch('/api/patients/all');
+        const patients = await response.json();
         
-        if (patients.length === 0) {
+        // For debugging
+        console.log("Patients data:", patients);
+        
+        if (!patients || patients.length === 0) {
             customersTable.innerHTML = '<tr><td colspan="7" class="text-center">No customers found</td></tr>';
             return;
         }
@@ -487,23 +490,33 @@ async function loadCustomers() {
         let html = '';
         
         patients.forEach(patient => {
-            const status = patient.is_active ? 
+            // Handle different possible data structures
+            const status = (patient.is_active !== undefined) ? patient.is_active : true;
+            const statusBadge = status ? 
                 '<span class="badge bg-success">Active</span>' : 
                 '<span class="badge bg-danger">Inactive</span>';
             
+            // Safely extract fields that might be nested or directly available
+            const patientId = patient.id || '';
+            const patientName = patient.name || '';
+            const patientEmail = patient.email || '';
+            const patientPhone = patient.phone || 'N/A';
+            const patientDOB = patient.date_of_birth || 'N/A';
+            const patientCreatedAt = patient.created_at || '';
+            
             html += `
                 <tr>
-                    <td>${patient.id.substring(0, 8)}...</td>
-                    <td>${patient.name}</td>
-                    <td>${patient.email}</td>
-                    <td>${patient.phone || 'N/A'}</td>
-                    <td>${patient.date_of_birth || 'N/A'}</td>
-                    <td>${formatDate(patient.created_at)}</td>
+                    <td>${patientId.substring(0, 8)}...</td>
+                    <td>${patientName}</td>
+                    <td>${patientEmail}</td>
+                    <td>${patientPhone}</td>
+                    <td>${patientDOB}</td>
+                    <td>${formatDate(patientCreatedAt)}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="viewCustomerProfile('${patient.id}')">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="viewCustomerProfile('${patientId}')">
                             <i class="bi bi-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="editCustomer('${patient.id}')">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="editCustomer('${patientId}')">
                             <i class="bi bi-pencil"></i>
                         </button>
                     </td>
