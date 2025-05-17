@@ -80,7 +80,7 @@ const AuthAPI = {
         formData.append('username', email);
         formData.append('password', password);
         
-        return fetch(`${API_BASE_URL}/auth/token`, {
+        return fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'

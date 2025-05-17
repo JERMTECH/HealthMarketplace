@@ -132,11 +132,11 @@
                     })
                     .then(userData => {
                         // Store user type and redirect
-                        localStorage.setItem('userType', userData.type);
-                        localStorage.setItem('userId', userData.id);
+                        localStorage.setItem('userType', userData.user.type);
+                        localStorage.setItem('userId', userData.user.id);
                         
                         // Redirect based on user type
-                        if (userData.type === 'clinic') {
+                        if (userData.user.type === 'clinic') {
                             window.location.href = 'clinic-dashboard.html';
                         } else {
                             window.location.href = 'patient-dashboard.html';
