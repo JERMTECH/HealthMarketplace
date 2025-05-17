@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Your Cart - MediMarket</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .cart-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .cart-button {
+            font-size: 2.5rem;
+            padding: 1.5rem 3rem;
+            background-color: #dc3545;
+            border: none;
+            border-radius: 10px;
+            margin-top: 1rem;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 20px rgba(220, 53, 69, 0.6);
+        }
+        .cart-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+        .navigation-buttons {
+            margin-top: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cart-container">
+            <div class="cart-icon">🛒</div>
+            <h1 class="mb-4">Your Shopping Cart</h1>
+            <div id="cart-items-count" class="fs-5 mb-3">
+                You have <span id="cart-count" class="fw-bold">0</span> items in your cart
+            </div>
+            <a href="/pages/cart.html" class="btn btn-danger cart-button">
+                VIEW CART NOW
+            </a>
+        </div>
+        
+        <div class="navigation-buttons">
+            <a href="/" class="btn btn-outline-primary">Home</a>
+            <a href="/pages/products.html" class="btn btn-outline-success">Continue Shopping</a>
+            <a href="/pages/patient-dashboard.html" class="btn btn-outline-dark">Patient Dashboard</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update cart count
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            document.getElementById('cart-count').textContent = cartItems.length;
+        });
+    </script>
+</body>
+</html>
