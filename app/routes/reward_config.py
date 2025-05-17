@@ -117,11 +117,11 @@ async def create_reward_configuration(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # Allow admin users (more permissive to ensure functionality)
-    admin_types = ["admin", "administrator", "system"]
-    if current_user.type not in admin_types:
-        # Print user type for debugging
-        print(f"User tried to access admin endpoint with type: {current_user.type}")
+    # Print current user info for debugging
+    print(f"User attempting to create reward config: {current_user.id}, {current_user.name}, type: {current_user.type}")
+    
+    # Accept any user with admin in their type (case insensitive)
+    if "admin" not in current_user.type.lower():
         raise HTTPException(status_code=403, detail="Only administrators can manage reward configurations")
     
     # If this config is set to active, deactivate all others
@@ -151,8 +151,11 @@ async def get_reward_configurations(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # Check if admin
-    if current_user.type != "admin":
+    # Print current user info for debugging
+    print(f"User attempting to view reward configs: {current_user.id}, {current_user.name}, type: {current_user.type}")
+    
+    # Accept any user with admin in their type (case insensitive)
+    if "admin" not in current_user.type.lower():
         raise HTTPException(status_code=403, detail="Only administrators can view reward configurations")
     
     configs = db.query(RewardConfig).order_by(desc(RewardConfig.is_active), desc(RewardConfig.created_at)).all()
@@ -164,8 +167,8 @@ async def get_reward_configuration(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # Check if admin
-    if current_user.type != "admin":
+    # Accept any user with admin in their type (case insensitive)
+    if "admin" not in current_user.type.lower():
         raise HTTPException(status_code=403, detail="Only administrators can view reward configurations")
     
     config = db.query(RewardConfig).filter(RewardConfig.id == config_id).first()
@@ -181,8 +184,8 @@ async def update_reward_configuration(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # Check if admin
-    if current_user.type != "admin":
+    # Accept any user with admin in their type (case insensitive)
+    if "admin" not in current_user.type.lower():
         raise HTTPException(status_code=403, detail="Only administrators can manage reward configurations")
     
     config = db.query(RewardConfig).filter(RewardConfig.id == config_id).first()
@@ -219,8 +222,8 @@ async def delete_reward_configuration(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # Check if admin
-    if current_user.type != "admin":
+    # Accept any user with admin in their type (case insensitive)
+    if "admin" not in current_user.type.lower():
         raise HTTPException(status_code=403, detail="Only administrators can manage reward configurations")
     
     config = db.query(RewardConfig).filter(RewardConfig.id == config_id).first()
