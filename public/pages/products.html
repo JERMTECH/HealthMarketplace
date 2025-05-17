@@ -53,14 +53,19 @@
     </nav>
 
     <div class="container py-5">
+        <!-- Shopping Cart Fixed Button -->
+        <div class="position-fixed bottom-0 end-0 mb-4 me-4" style="z-index: 1000;">
+            <a href="/pages/cart.html" class="btn btn-lg btn-success rounded-circle p-3 shadow" style="width: 80px; height: 80px;">
+                <i data-feather="shopping-cart" style="width: 30px; height: 30px;"></i>
+                <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    0
+                </span>
+            </a>
+        </div>
+
         <div class="row mb-4">
-            <div class="col-md-8">
+            <div class="col-12">
                 <h1>Healthcare Products</h1>
-            </div>
-            <div class="col-md-4 text-end">
-                <a href="/pages/cart.html" class="btn btn-success btn-lg" style="font-size: 20px; padding: 15px 30px; background-color: #28a745; border: none;">
-                    🛒 Shopping Cart (<span id="cart-count">0</span>)
-                </a>
             </div>
         </div>
         
