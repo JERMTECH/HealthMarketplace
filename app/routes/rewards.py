@@ -96,7 +96,7 @@ async def get_patient_rewards(
     card = db.query(RewardCard).filter(RewardCard.patient_id == patient_id).first()
     
     return {
-        "totalPoints": total_points,
+        "total_points": total_points,
         "history": history,
         "card": card
     }
