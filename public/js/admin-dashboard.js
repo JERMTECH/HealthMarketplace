@@ -32,60 +32,101 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Global functions to handle actions directly from onclick attributes
-function viewProductDetails(id) {
-    try {
-        const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
-        if (productRow) {
-            const name = productRow.querySelector('td:nth-child(2)').textContent;
-            const type = productRow.querySelector('td:nth-child(3)').textContent;
-            const clinic = productRow.querySelector('td:nth-child(4)').textContent;
-            const price = productRow.querySelector('td:nth-child(5)').textContent;
-            
-            // Update modal
-            document.getElementById('product-detail-name').textContent = name;
-            document.getElementById('product-detail-type').textContent = type;
-            document.getElementById('product-detail-clinic').textContent = clinic;
-            document.getElementById('product-detail-price').textContent = price;
-            document.getElementById('product-detail-id').textContent = id;
-            
-            // Show modal using Bootstrap
-            const modalElement = document.getElementById('productDetailsModal');
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        } else {
-            alert('Product not found');
+// Global object with admin functions
+window.AdminActions = {
+    viewProductDetails: function(id) {
+        try {
+            const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+            if (productRow) {
+                const name = productRow.querySelector('td:nth-child(2)').textContent;
+                const type = productRow.querySelector('td:nth-child(3)').textContent;
+                const clinic = productRow.querySelector('td:nth-child(4)').textContent;
+                const price = productRow.querySelector('td:nth-child(5)').textContent;
+                
+                // Update modal
+                document.getElementById('product-detail-name').textContent = name;
+                document.getElementById('product-detail-type').textContent = type;
+                document.getElementById('product-detail-clinic').textContent = clinic;
+                document.getElementById('product-detail-price').textContent = price;
+                document.getElementById('product-detail-id').textContent = id;
+                
+                // Show modal using Bootstrap
+                const modalElement = document.getElementById('productDetailsModal');
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else {
+                alert('Product not found');
+            }
+        } catch (error) {
+            console.error('Error showing product details:', error);
+            alert('Error: ' + error.message);
         }
-    } catch (error) {
-        console.error('Error showing product details:', error);
-        alert('Error: ' + error.message);
+    },
+    
+    editProduct: function(id) {
+        try {
+            const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+            if (productRow) {
+                const name = productRow.querySelector('td:nth-child(2)').textContent;
+                const type = productRow.querySelector('td:nth-child(3)').textContent;
+                const price = productRow.querySelector('td:nth-child(5)').textContent.replace('$', '');
+                
+                // Pre-fill form
+                document.getElementById('edit-product-id').value = id;
+                document.getElementById('edit-product-name').value = name;
+                document.getElementById('edit-product-type').value = type;
+                document.getElementById('edit-product-price').value = price;
+                
+                // Show modal using Bootstrap
+                const modalElement = document.getElementById('productEditModal');
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else {
+                alert('Product not found for editing');
+            }
+        } catch (error) {
+            console.error('Error editing product:', error);
+            alert('Error: ' + error.message);
+        }
+    },
+    
+    toggleProductStatus: function(id) {
+        try {
+            // Toggle product availability
+            const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+            if (productRow) {
+                const statusCell = productRow.querySelector('td:nth-child(6)');
+                const currentStatus = statusCell.querySelector('.badge').textContent;
+                
+                // Toggle status
+                if (currentStatus.includes('In Stock')) {
+                    statusCell.innerHTML = '<span class="badge bg-danger">Out of Stock</span>';
+                    alert('Product marked as Out of Stock');
+                } else {
+                    statusCell.innerHTML = '<span class="badge bg-success">In Stock</span>';
+                    alert('Product marked as In Stock');
+                }
+            } else {
+                alert('Product not found');
+            }
+        } catch (error) {
+            console.error('Error toggling product status:', error);
+            alert('Error: ' + error.message);
+        }
     }
+};
+
+// Make sure old functions are also available
+function viewProductDetails(id) {
+    window.AdminActions.viewProductDetails(id);
 }
 
 function editProduct(id) {
-    try {
-        const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
-        if (productRow) {
-            const name = productRow.querySelector('td:nth-child(2)').textContent;
-            const type = productRow.querySelector('td:nth-child(3)').textContent;
-            const price = productRow.querySelector('td:nth-child(5)').textContent.replace('$', '');
-            
-            // Pre-fill form
-            document.getElementById('edit-product-id').value = id;
-            document.getElementById('edit-product-name').value = name;
-            document.getElementById('edit-product-type').value = type;
-            document.getElementById('edit-product-price').value = price;
-            
-            // Show modal using Bootstrap
-            const modalElement = document.getElementById('productEditModal');
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        } else {
-            alert('Product not found for editing');
-        }
-    } catch (error) {
-        console.error('Error editing product:', error);
-        alert('Error: ' + error.message);
-    }
+    window.AdminActions.editProduct(id);
+}
+
+function toggleProductStatus(id) {
+    window.AdminActions.toggleProductStatus(id);
 }
 
 // Functions to save changes for each form type
@@ -118,7 +159,8 @@ function saveProductChanges() {
     }
 }
 
-window.viewCustomerProfile = function(id) {
+// Extend AdminActions with customer and clinic methods
+window.AdminActions.viewCustomerProfile = function(id) {
     try {
         const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
         if (customerRow) {
@@ -145,7 +187,7 @@ window.viewCustomerProfile = function(id) {
     }
 };
 
-window.editCustomer = function(id) {
+window.AdminActions.editCustomer = function(id) {
     try {
         const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
         if (customerRow) {
@@ -201,7 +243,7 @@ function saveCustomerChanges() {
     }
 }
 
-window.viewClinicProfile = function(id) {
+window.AdminActions.viewClinicProfile = function(id) {
     try {
         const clinicRow = document.querySelector(`#clinics-table tr[data-id="${id}"]`);
         if (clinicRow) {
@@ -230,7 +272,7 @@ window.viewClinicProfile = function(id) {
     }
 };
 
-window.editClinic = function(id) {
+window.AdminActions.editClinic = function(id) {
     try {
         const clinicRow = document.querySelector(`#clinics-table tr[data-id="${id}"]`);
         if (clinicRow) {
@@ -259,30 +301,22 @@ window.editClinic = function(id) {
     }
 };
 
-window.toggleProductStatus = function(id) {
-    try {
-        // Toggle product availability
-        const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
-        if (productRow) {
-            const statusCell = productRow.querySelector('td:nth-child(6)');
-            const currentStatus = statusCell.querySelector('.badge').textContent;
-            
-            // Toggle status
-            if (currentStatus.includes('In Stock')) {
-                statusCell.innerHTML = '<span class="badge bg-danger">Out of Stock</span>';
-                alert('Product marked as Out of Stock');
-            } else {
-                statusCell.innerHTML = '<span class="badge bg-success">In Stock</span>';
-                alert('Product marked as In Stock');
-            }
-        } else {
-            alert('Product not found');
-        }
-    } catch (error) {
-        console.error('Error toggling product status:', error);
-        alert('Error: ' + error.message);
-    }
-};
+// Add helper functions for the old function names
+function viewCustomerProfile(id) {
+    window.AdminActions.viewCustomerProfile(id);
+}
+
+function editCustomer(id) {
+    window.AdminActions.editCustomer(id);
+}
+
+function viewClinicProfile(id) {
+    window.AdminActions.viewClinicProfile(id);
+}
+
+function editClinic(id) {
+    window.AdminActions.editClinic(id);
+}
 
 function saveClinicChanges() {
     try {
@@ -722,13 +756,13 @@ async function loadProducts() {
                     <td>$${parseFloat(product.price).toFixed(2)}</td>
                     <td>${status}</td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-1 view-product-btn" data-product-id="${product.id}">
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="window.AdminActions.viewProductDetails('${product.id}')">
                             <i class="bi bi-eye"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-1 edit-product-btn" data-product-id="${product.id}">
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="window.AdminActions.editProduct('${product.id}')">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger toggle-product-btn" data-product-id="${product.id}">
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="window.AdminActions.toggleProductStatus('${product.id}')">
                             <i class="bi bi-power"></i>
                         </button>
                     </td>
@@ -737,28 +771,6 @@ async function loadProducts() {
         });
         
         productsTable.innerHTML = html;
-        
-        // Add event listeners to the newly created buttons
-        document.querySelectorAll('.view-product-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-product-id');
-                viewProductDetails(id);
-            });
-        });
-        
-        document.querySelectorAll('.edit-product-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-product-id');
-                editProduct(id);
-            });
-        });
-        
-        document.querySelectorAll('.toggle-product-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-product-id');
-                toggleProductStatus(id);
-            });
-        });
         
         // Load clinic dropdowns for filters
         loadClinicDropdowns();
