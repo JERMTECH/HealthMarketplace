@@ -744,7 +744,7 @@ async function loadProducts() {
                 '<span class="badge bg-success">In Stock</span>' : 
                 '<span class="badge bg-danger">Out of Stock</span>';
             
-            // Use simple function calls for buttons
+            // Simplest possible approach - add class buttons for event handlers
             html += `
                 <tr data-id="${product.id}">
                     <td>${product.id.substring(0, 8)}...</td>
@@ -754,16 +754,13 @@ async function loadProducts() {
                     <td>$${parseFloat(product.price).toFixed(2)}</td>
                     <td>${status}</td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-1" 
-                            onclick="alert('View product: ' + '${product.name.replace(/'/g, "\\'")}')">
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1 product-view-btn" data-product-id="${product.id}">
                             <i class="bi bi-eye"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-1"
-                            onclick="alert('Edit product: ' + '${product.name.replace(/'/g, "\\'")}')">
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-1 product-edit-btn" data-product-id="${product.id}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger"
-                            onclick="alert('Toggle status for: ' + '${product.name.replace(/'/g, "\\'")}')">
+                        <button type="button" class="btn btn-sm btn-outline-danger product-toggle-btn" data-product-id="${product.id}">
                             <i class="bi bi-power"></i>
                         </button>
                     </td>
@@ -772,6 +769,34 @@ async function loadProducts() {
         });
         
         productsTable.innerHTML = html;
+        
+        // Add click event listeners after HTML is inserted
+        document.querySelectorAll('.product-view-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                const row = document.querySelector(`tr[data-id="${productId}"]`);
+                const name = row.querySelector('td:nth-child(2)').textContent;
+                alert('View product: ' + name);
+            });
+        });
+        
+        document.querySelectorAll('.product-edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                const row = document.querySelector(`tr[data-id="${productId}"]`);
+                const name = row.querySelector('td:nth-child(2)').textContent;
+                alert('Edit product: ' + name);
+            });
+        });
+        
+        document.querySelectorAll('.product-toggle-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                const row = document.querySelector(`tr[data-id="${productId}"]`);
+                const name = row.querySelector('td:nth-child(2)').textContent;
+                alert('Toggle status for: ' + name);
+            });
+        });
         
         // Load clinic dropdowns for filters
         loadClinicDropdowns();
