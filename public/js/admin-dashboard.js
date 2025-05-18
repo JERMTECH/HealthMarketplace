@@ -505,7 +505,7 @@ async function loadCustomers() {
             const patientCreatedAt = patient.created_at || '';
             
             html += `
-                <tr>
+                <tr data-id="${patientId}">
                     <td>${patientId.substring(0, 8)}...</td>
                     <td>${patientName}</td>
                     <td>${patientEmail}</td>
@@ -554,7 +554,7 @@ async function loadClinics() {
                 '<span class="badge bg-danger">Inactive</span>';
             
             html += `
-                <tr>
+                <tr data-id="${clinic.id}">
                     <td>${clinic.id.substring(0, 8)}...</td>
                     <td>${clinic.user.name}</td>
                     <td>${clinic.specialization || 'General'}</td>
@@ -626,11 +626,11 @@ async function loadAppointments() {
             const statusClass = getAppointmentStatusClass(appointment.status);
             
             html += `
-                <tr>
+                <tr data-id="${appointment.id}">
                     <td>${appointment.id.substring(0, 8)}...</td>
-                    <td>${appointment.patient ? appointment.patient.user.name : 'N/A'}</td>
-                    <td>${appointment.clinic ? appointment.clinic.user.name : 'N/A'}</td>
-                    <td>${appointment.service ? appointment.service.name : 'N/A'}</td>
+                    <td>${appointment.patient ? appointment.patient.user.name : appointment.patient_name || 'N/A'}</td>
+                    <td>${appointment.clinic ? appointment.clinic.user.name : appointment.clinic_name || 'N/A'}</td>
+                    <td>${appointment.service ? appointment.service.name : appointment.service_name || 'N/A'}</td>
                     <td>${appointment.date} at ${appointment.time}</td>
                     <td><span class="badge ${statusClass}">${appointment.status}</span></td>
                     <td>
@@ -673,7 +673,7 @@ async function loadOrders() {
             const statusClass = getStatusClass(order.status);
             
             html += `
-                <tr>
+                <tr data-id="${order.id}">
                     <td>${order.id.substring(0, 8)}...</td>
                     <td>${order.patient ? order.patient.user.name : 'N/A'}</td>
                     <td>$${parseFloat(order.total).toFixed(2)}</td>
