@@ -744,7 +744,7 @@ async function loadProducts() {
                 '<span class="badge bg-success">In Stock</span>' : 
                 '<span class="badge bg-danger">Out of Stock</span>';
             
-            // Store product as a data attribute for easy access
+            // Using direct inline onclick handlers for simplicity and reliability
             html += `
                 <tr data-id="${product.id}">
                     <td>${product.id.substring(0, 8)}...</td>
@@ -754,97 +754,24 @@ async function loadProducts() {
                     <td>$${parseFloat(product.price).toFixed(2)}</td>
                     <td>${status}</td>
                     <td>
-                        <a href="#" class="view-action btn btn-sm btn-outline-primary me-1" data-id="${product.id}">
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" 
+                            onclick="showProductDetails('${product.id}', '${product.name}', 'Product', '${product.clinic ? product.clinic.name.replace(/'/g, "\\'") : 'N/A'}', '$${parseFloat(product.price).toFixed(2)}')">
                             <i class="bi bi-eye"></i>
-                        </a>
-                        <a href="#" class="edit-action btn btn-sm btn-outline-secondary me-1" data-id="${product.id}">
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-1"
+                            onclick="showProductEdit('${product.id}', '${product.name.replace(/'/g, "\\'")}', 'Product', '${parseFloat(product.price).toFixed(2)}')">
                             <i class="bi bi-pencil"></i>
-                        </a>
-                        <a href="#" class="toggle-action btn btn-sm btn-outline-danger" data-id="${product.id}">
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                            onclick="toggleProductStatus('${product.id}', ${product.in_stock})">
                             <i class="bi bi-power"></i>
-                        </a>
+                        </button>
                     </td>
                 </tr>
             `;
         });
         
         productsTable.innerHTML = html;
-        
-        // Add direct event handlers to all buttons
-        document.querySelectorAll('.view-action').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const id = this.getAttribute('data-id');
-                
-                // Get product data
-                const row = document.querySelector(`tr[data-id="${id}"]`);
-                if (!row) return;
-                
-                const name = row.querySelector('td:nth-child(2)').textContent;
-                const type = row.querySelector('td:nth-child(3)').textContent;
-                const clinic = row.querySelector('td:nth-child(4)').textContent;
-                const price = row.querySelector('td:nth-child(5)').textContent;
-                
-                // Update modal
-                document.getElementById('product-detail-name').textContent = name;
-                document.getElementById('product-detail-type').textContent = type;
-                document.getElementById('product-detail-clinic').textContent = clinic;
-                document.getElementById('product-detail-price').textContent = price;
-                document.getElementById('product-detail-id').textContent = id;
-                
-                // Show modal
-                const modal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
-                modal.show();
-            });
-        });
-        
-        document.querySelectorAll('.edit-action').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const id = this.getAttribute('data-id');
-                
-                // Get product data
-                const row = document.querySelector(`tr[data-id="${id}"]`);
-                if (!row) return;
-                
-                const name = row.querySelector('td:nth-child(2)').textContent;
-                const type = row.querySelector('td:nth-child(3)').textContent;
-                const price = row.querySelector('td:nth-child(5)').textContent.replace('$', '');
-                
-                // Fill form
-                document.getElementById('edit-product-id').value = id;
-                document.getElementById('edit-product-name').value = name;
-                document.getElementById('edit-product-type').value = type;
-                document.getElementById('edit-product-price').value = price;
-                
-                // Show modal
-                const modal = new bootstrap.Modal(document.getElementById('productEditModal'));
-                modal.show();
-            });
-        });
-        
-        document.querySelectorAll('.toggle-action').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const id = this.getAttribute('data-id');
-                
-                // Get row
-                const row = document.querySelector(`tr[data-id="${id}"]`);
-                if (!row) return;
-                
-                const statusCell = row.querySelector('td:nth-child(6)');
-                const currentStatus = statusCell.querySelector('.badge').textContent;
-                
-                // Toggle status
-                if (currentStatus.includes('In Stock')) {
-                    statusCell.innerHTML = '<span class="badge bg-danger">Out of Stock</span>';
-                    alert('Product marked as Out of Stock');
-                } else {
-                    statusCell.innerHTML = '<span class="badge bg-success">In Stock</span>';
-                    alert('Product marked as In Stock');
-                }
-            });
-        });
         
         // Load clinic dropdowns for filters
         loadClinicDropdowns();
