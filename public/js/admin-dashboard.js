@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load dashboard data
     loadDashboardStatistics();
     
+    // Create modals for action buttons
+    createActionModals();
+    
     // Setup logout functionality
     document.getElementById('logout-btn').addEventListener('click', function(e) {
         e.preventDefault();
@@ -17,6 +20,59 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '/pages/login.html';
     });
 });
+
+// Create all needed modals at initialization
+function createActionModals() {
+    // Create toast container for notifications
+    if (!document.getElementById('toast-container')) {
+        createToastContainer();
+    }
+    
+    // Create all modals for viewing and editing
+    if (!document.getElementById('productDetailsModal')) {
+        createProductDetailsModal();
+    }
+    
+    if (!document.getElementById('productEditModal')) {
+        createProductEditModal();
+    }
+    
+    if (!document.getElementById('customerDetailsModal')) {
+        createCustomerDetailsModal();
+    }
+    
+    if (!document.getElementById('customerEditModal')) {
+        createCustomerEditModal();
+    }
+    
+    if (!document.getElementById('clinicDetailsModal')) {
+        createClinicDetailsModal();
+    }
+    
+    if (!document.getElementById('clinicEditModal')) {
+        createClinicEditModal();
+    }
+    
+    if (!document.getElementById('appointmentDetailsModal')) {
+        createAppointmentDetailsModal();
+    }
+    
+    if (!document.getElementById('orderDetailsModal')) {
+        createOrderDetailsModal();
+    }
+    
+    if (!document.getElementById('rewardHistoryModal')) {
+        createRewardHistoryModal();
+    }
+    
+    if (!document.getElementById('adjustPointsModal')) {
+        createAdjustPointsModal();
+    }
+    
+    if (!document.getElementById('partnerEditModal')) {
+        createPartnerEditModal();
+    }
+}
 
 // Validate that the current user has admin access
 function validateAdminAccess() {
@@ -883,7 +939,10 @@ document.getElementById('generate-inventory-report')?.addEventListener('click', 
 // Admin action functions with full implementation
 function viewProductDetails(id) {
     // Get the product details and show in a modal
-    const modal = new bootstrap.Modal(document.getElementById('productDetailsModal') || createProductDetailsModal());
+    let modalElement = document.getElementById('productDetailsModal');
+    if (!modalElement) {
+        modalElement = createProductDetailsModal();
+    }
     
     // Find the product in the table
     const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
@@ -900,6 +959,7 @@ function viewProductDetails(id) {
         document.getElementById('product-detail-price').textContent = price;
         document.getElementById('product-detail-id').textContent = id;
         
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
     } else {
         showNotification('Product details not found', 'error');
@@ -908,7 +968,10 @@ function viewProductDetails(id) {
 
 function editProduct(id) {
     // Open edit form in a modal
-    const modal = new bootstrap.Modal(document.getElementById('productEditModal') || createProductEditModal());
+    let modalElement = document.getElementById('productEditModal');
+    if (!modalElement) {
+        modalElement = createProductEditModal();
+    }
     
     // Find product and pre-fill the form
     const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
@@ -924,6 +987,7 @@ function editProduct(id) {
         document.getElementById('edit-product-type').value = productType;
         document.getElementById('edit-product-price').value = price;
         
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
     } else {
         showNotification('Product not found for editing', 'error');
@@ -952,7 +1016,10 @@ function toggleProductStatus(id) {
 
 function viewCustomerProfile(id) {
     // Show customer details in a modal
-    const modal = new bootstrap.Modal(document.getElementById('customerDetailsModal') || createCustomerDetailsModal());
+    let modalElement = document.getElementById('customerDetailsModal');
+    if (!modalElement) {
+        modalElement = createCustomerDetailsModal();
+    }
     
     // Find customer data
     const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
@@ -967,6 +1034,7 @@ function viewCustomerProfile(id) {
         document.getElementById('customer-detail-phone').textContent = phone;
         document.getElementById('customer-detail-id').textContent = id;
         
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
     } else {
         showNotification('Customer details not found', 'error');
@@ -975,7 +1043,10 @@ function viewCustomerProfile(id) {
 
 function editCustomer(id) {
     // Show edit form for customer
-    const modal = new bootstrap.Modal(document.getElementById('customerEditModal') || createCustomerEditModal());
+    let modalElement = document.getElementById('customerEditModal');
+    if (!modalElement) {
+        modalElement = createCustomerEditModal();
+    }
     
     // Find customer data
     const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
@@ -990,6 +1061,7 @@ function editCustomer(id) {
         document.getElementById('edit-customer-email').value = email;
         document.getElementById('edit-customer-phone').value = phone;
         
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
     } else {
         showNotification('Customer not found for editing', 'error');
