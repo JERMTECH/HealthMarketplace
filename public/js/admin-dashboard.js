@@ -939,11 +939,6 @@ document.getElementById('generate-inventory-report')?.addEventListener('click', 
 // Admin action functions with full implementation
 function viewProductDetails(id) {
     // Get the product details and show in a modal
-    let modalElement = document.getElementById('productDetailsModal');
-    if (!modalElement) {
-        modalElement = createProductDetailsModal();
-    }
-    
     // Find the product in the table
     const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
     if (productRow) {
@@ -959,6 +954,7 @@ function viewProductDetails(id) {
         document.getElementById('product-detail-price').textContent = price;
         document.getElementById('product-detail-id').textContent = id;
         
+        const modalElement = document.getElementById('productDetailsModal');
         const modal = new bootstrap.Modal(modalElement);
         modal.show();
     } else {
@@ -968,11 +964,6 @@ function viewProductDetails(id) {
 
 function editProduct(id) {
     // Open edit form in a modal
-    let modalElement = document.getElementById('productEditModal');
-    if (!modalElement) {
-        modalElement = createProductEditModal();
-    }
-    
     // Find product and pre-fill the form
     const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
     if (productRow) {
@@ -987,8 +978,29 @@ function editProduct(id) {
         document.getElementById('edit-product-type').value = productType;
         document.getElementById('edit-product-price').value = price;
         
+        const modalElement = document.getElementById('productEditModal');
         const modal = new bootstrap.Modal(modalElement);
         modal.show();
+        
+        // Add event listener for the save button
+        document.getElementById('save-product-btn').onclick = function() {
+            const form = document.getElementById('edit-product-form');
+            if (form.checkValidity()) {
+                const name = document.getElementById('edit-product-name').value;
+                const type = document.getElementById('edit-product-type').value;
+                const price = document.getElementById('edit-product-price').value;
+                
+                // Update the table row
+                productRow.querySelector('td:nth-child(2)').textContent = name;
+                productRow.querySelector('td:nth-child(3)').textContent = type;
+                productRow.querySelector('td:nth-child(5)').textContent = '$' + parseFloat(price).toFixed(2);
+                
+                showNotification('Product updated successfully', 'success');
+                bootstrap.Modal.getInstance(modalElement).hide();
+            } else {
+                form.reportValidity();
+            }
+        };
     } else {
         showNotification('Product not found for editing', 'error');
     }
@@ -1016,11 +1028,6 @@ function toggleProductStatus(id) {
 
 function viewCustomerProfile(id) {
     // Show customer details in a modal
-    let modalElement = document.getElementById('customerDetailsModal');
-    if (!modalElement) {
-        modalElement = createCustomerDetailsModal();
-    }
-    
     // Find customer data
     const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
     if (customerRow) {
@@ -1034,6 +1041,7 @@ function viewCustomerProfile(id) {
         document.getElementById('customer-detail-phone').textContent = phone;
         document.getElementById('customer-detail-id').textContent = id;
         
+        const modalElement = document.getElementById('customerDetailsModal');
         const modal = new bootstrap.Modal(modalElement);
         modal.show();
     } else {
@@ -1043,11 +1051,6 @@ function viewCustomerProfile(id) {
 
 function editCustomer(id) {
     // Show edit form for customer
-    let modalElement = document.getElementById('customerEditModal');
-    if (!modalElement) {
-        modalElement = createCustomerEditModal();
-    }
-    
     // Find customer data
     const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
     if (customerRow) {
@@ -1061,8 +1064,29 @@ function editCustomer(id) {
         document.getElementById('edit-customer-email').value = email;
         document.getElementById('edit-customer-phone').value = phone;
         
+        const modalElement = document.getElementById('customerEditModal');
         const modal = new bootstrap.Modal(modalElement);
         modal.show();
+        
+        // Add event listener for the save button
+        document.getElementById('save-customer-btn').onclick = function() {
+            const form = document.getElementById('edit-customer-form');
+            if (form.checkValidity()) {
+                const updatedName = document.getElementById('edit-customer-name').value;
+                const updatedEmail = document.getElementById('edit-customer-email').value;
+                const updatedPhone = document.getElementById('edit-customer-phone').value;
+                
+                // Update the table row
+                customerRow.querySelector('td:nth-child(2)').textContent = updatedName;
+                customerRow.querySelector('td:nth-child(3)').textContent = updatedEmail;
+                customerRow.querySelector('td:nth-child(4)').textContent = updatedPhone;
+                
+                showNotification('Customer updated successfully', 'success');
+                bootstrap.Modal.getInstance(modalElement).hide();
+            } else {
+                form.reportValidity();
+            }
+        };
     } else {
         showNotification('Customer not found for editing', 'error');
     }
