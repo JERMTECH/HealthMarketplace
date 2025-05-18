@@ -10,63 +10,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load dashboard data
     loadDashboardStatistics();
     
-    // Setup direct event listeners for all action buttons
-    document.addEventListener('click', function(event) {
-        // Event delegation for view buttons
-        if (event.target.closest('[onclick^="viewProduct"]')) {
-            event.preventDefault();
-            const button = event.target.closest('[onclick^="viewProduct"]');
-            const id = button.getAttribute('data-id');
-            if (id) viewProductDetails(id);
-        }
-        
-        if (event.target.closest('[onclick^="editProduct"]')) {
-            event.preventDefault();
-            const button = event.target.closest('[onclick^="editProduct"]');
-            const id = button.getAttribute('data-id');
-            if (id) editProduct(id);
-        }
-        
-        if (event.target.closest('[onclick^="viewCustomer"]')) {
-            event.preventDefault();
-            const button = event.target.closest('[onclick^="viewCustomer"]');
-            const id = button.getAttribute('data-id');
-            if (id) viewCustomerProfile(id);
-        }
-        
-        if (event.target.closest('[onclick^="editCustomer"]')) {
-            event.preventDefault();
-            const button = event.target.closest('[onclick^="editCustomer"]');
-            const id = button.getAttribute('data-id');
-            if (id) editCustomer(id);
-        }
-        
-        if (event.target.closest('[onclick^="viewClinic"]')) {
-            event.preventDefault();
-            const button = event.target.closest('[onclick^="viewClinic"]');
-            const id = button.getAttribute('data-id');
-            if (id) viewClinicProfile(id);
-        }
-        
-        if (event.target.closest('[onclick^="editClinic"]')) {
-            event.preventDefault();
-            const button = event.target.closest('[onclick^="editClinic"]');
-            const id = button.getAttribute('data-id');
-            if (id) editClinic(id);
-        }
-        
-        if (event.target.closest('[onclick^="toggleProduct"]')) {
-            event.preventDefault();
-            const button = event.target.closest('[onclick^="toggleProduct"]');
-            const id = button.getAttribute('data-id');
-            if (id) toggleProductStatus(id);
-        }
-    });
+    // Add click handlers for specific buttons
+    if (document.getElementById('save-product-btn')) {
+        document.getElementById('save-product-btn').addEventListener('click', saveProductChanges);
+    }
     
-    // Set up save button event handlers
-    document.getElementById('save-product-btn')?.addEventListener('click', saveProductChanges);
-    document.getElementById('save-customer-btn')?.addEventListener('click', saveCustomerChanges);
-    document.getElementById('save-clinic-btn')?.addEventListener('click', saveClinicChanges);
+    if (document.getElementById('save-customer-btn')) {
+        document.getElementById('save-customer-btn').addEventListener('click', saveCustomerChanges);
+    }
+    
+    if (document.getElementById('save-clinic-btn')) {
+        document.getElementById('save-clinic-btn').addEventListener('click', saveClinicChanges);
+    }
     
     // Setup logout functionality
     document.getElementById('logout-btn').addEventListener('click', function(e) {
@@ -76,81 +31,287 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Functions to save changes for each form type
-function saveProductChanges() {
-    const form = document.getElementById('edit-product-form');
-    const id = document.getElementById('edit-product-id').value;
-    if (form.checkValidity()) {
-        const name = document.getElementById('edit-product-name').value;
-        const type = document.getElementById('edit-product-type').value;
-        const price = document.getElementById('edit-product-price').value;
-        
-        // Update the corresponding row in the table
+// Global window-level functions to handle actions directly from onclick attributes
+window.viewProductDetails = function(id) {
+    try {
         const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
         if (productRow) {
-            productRow.querySelector('td:nth-child(2)').textContent = name;
-            productRow.querySelector('td:nth-child(3)').textContent = type;
-            productRow.querySelector('td:nth-child(5)').textContent = '$' + parseFloat(price).toFixed(2);
+            const name = productRow.querySelector('td:nth-child(2)').textContent;
+            const type = productRow.querySelector('td:nth-child(3)').textContent;
+            const clinic = productRow.querySelector('td:nth-child(4)').textContent;
+            const price = productRow.querySelector('td:nth-child(5)').textContent;
             
-            showNotification('Product updated successfully', 'success');
-            const modalElement = document.getElementById('productEditModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) modal.hide();
+            // Update modal
+            document.getElementById('product-detail-name').textContent = name;
+            document.getElementById('product-detail-type').textContent = type;
+            document.getElementById('product-detail-clinic').textContent = clinic;
+            document.getElementById('product-detail-price').textContent = price;
+            document.getElementById('product-detail-id').textContent = id;
+            
+            // Show modal using Bootstrap
+            const modalElement = document.getElementById('productDetailsModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            alert('Product not found');
         }
-    } else {
-        form.reportValidity();
+    } catch (error) {
+        console.error('Error showing product details:', error);
+        alert('Error: ' + error.message);
+    }
+};
+
+window.editProduct = function(id) {
+    try {
+        const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+        if (productRow) {
+            const name = productRow.querySelector('td:nth-child(2)').textContent;
+            const type = productRow.querySelector('td:nth-child(3)').textContent;
+            const price = productRow.querySelector('td:nth-child(5)').textContent.replace('$', '');
+            
+            // Pre-fill form
+            document.getElementById('edit-product-id').value = id;
+            document.getElementById('edit-product-name').value = name;
+            document.getElementById('edit-product-type').value = type;
+            document.getElementById('edit-product-price').value = price;
+            
+            // Show modal using Bootstrap
+            const modalElement = document.getElementById('productEditModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            alert('Product not found for editing');
+        }
+    } catch (error) {
+        console.error('Error editing product:', error);
+        alert('Error: ' + error.message);
+    }
+};
+
+// Functions to save changes for each form type
+function saveProductChanges() {
+    try {
+        const form = document.getElementById('edit-product-form');
+        const id = document.getElementById('edit-product-id').value;
+        if (form.checkValidity()) {
+            const name = document.getElementById('edit-product-name').value;
+            const type = document.getElementById('edit-product-type').value;
+            const price = document.getElementById('edit-product-price').value;
+            
+            // Update the corresponding row in the table
+            const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+            if (productRow) {
+                productRow.querySelector('td:nth-child(2)').textContent = name;
+                productRow.querySelector('td:nth-child(3)').textContent = type;
+                productRow.querySelector('td:nth-child(5)').textContent = '$' + parseFloat(price).toFixed(2);
+                
+                alert('Product updated successfully');
+                const modalElement = document.getElementById('productEditModal');
+                bootstrap.Modal.getInstance(modalElement).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    } catch (error) {
+        console.error('Error saving product:', error);
+        alert('Error: ' + error.message);
     }
 }
 
-function saveCustomerChanges() {
-    const form = document.getElementById('edit-customer-form');
-    const id = document.getElementById('edit-customer-id').value;
-    if (form.checkValidity()) {
-        const name = document.getElementById('edit-customer-name').value;
-        const email = document.getElementById('edit-customer-email').value;
-        const phone = document.getElementById('edit-customer-phone').value;
-        
-        // Update the corresponding row in the table
+window.viewCustomerProfile = function(id) {
+    try {
         const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
         if (customerRow) {
-            customerRow.querySelector('td:nth-child(2)').textContent = name;
-            customerRow.querySelector('td:nth-child(3)').textContent = email;
-            customerRow.querySelector('td:nth-child(4)').textContent = phone;
+            const name = customerRow.querySelector('td:nth-child(2)').textContent;
+            const email = customerRow.querySelector('td:nth-child(3)').textContent;
+            const phone = customerRow.querySelector('td:nth-child(4)').textContent;
             
-            showNotification('Customer updated successfully', 'success');
-            const modalElement = document.getElementById('customerEditModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) modal.hide();
+            // Update modal
+            document.getElementById('customer-detail-name').textContent = name;
+            document.getElementById('customer-detail-email').textContent = email;
+            document.getElementById('customer-detail-phone').textContent = phone;
+            document.getElementById('customer-detail-id').textContent = id;
+            
+            // Show modal using Bootstrap
+            const modalElement = document.getElementById('customerDetailsModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            alert('Customer not found');
         }
-    } else {
-        form.reportValidity();
+    } catch (error) {
+        console.error('Error showing customer details:', error);
+        alert('Error: ' + error.message);
+    }
+};
+
+window.editCustomer = function(id) {
+    try {
+        const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
+        if (customerRow) {
+            const name = customerRow.querySelector('td:nth-child(2)').textContent;
+            const email = customerRow.querySelector('td:nth-child(3)').textContent;
+            const phone = customerRow.querySelector('td:nth-child(4)').textContent;
+            
+            // Pre-fill form
+            document.getElementById('edit-customer-id').value = id;
+            document.getElementById('edit-customer-name').value = name;
+            document.getElementById('edit-customer-email').value = email;
+            document.getElementById('edit-customer-phone').value = phone;
+            
+            // Show modal using Bootstrap
+            const modalElement = document.getElementById('customerEditModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            alert('Customer not found for editing');
+        }
+    } catch (error) {
+        console.error('Error editing customer:', error);
+        alert('Error: ' + error.message);
+    }
+};
+
+function saveCustomerChanges() {
+    try {
+        const form = document.getElementById('edit-customer-form');
+        const id = document.getElementById('edit-customer-id').value;
+        if (form.checkValidity()) {
+            const name = document.getElementById('edit-customer-name').value;
+            const email = document.getElementById('edit-customer-email').value;
+            const phone = document.getElementById('edit-customer-phone').value;
+            
+            // Update the corresponding row in the table
+            const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
+            if (customerRow) {
+                customerRow.querySelector('td:nth-child(2)').textContent = name;
+                customerRow.querySelector('td:nth-child(3)').textContent = email;
+                customerRow.querySelector('td:nth-child(4)').textContent = phone;
+                
+                alert('Customer updated successfully');
+                const modalElement = document.getElementById('customerEditModal');
+                bootstrap.Modal.getInstance(modalElement).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    } catch (error) {
+        console.error('Error saving customer:', error);
+        alert('Error: ' + error.message);
     }
 }
 
-function saveClinicChanges() {
-    const form = document.getElementById('edit-clinic-form');
-    const id = document.getElementById('edit-clinic-id').value;
-    if (form.checkValidity()) {
-        const name = document.getElementById('edit-clinic-name').value;
-        const specialization = document.getElementById('edit-clinic-specialization').value;
-        const location = document.getElementById('edit-clinic-location').value;
-        const phone = document.getElementById('edit-clinic-phone').value;
-        
-        // Update the corresponding row in the table
+window.viewClinicProfile = function(id) {
+    try {
         const clinicRow = document.querySelector(`#clinics-table tr[data-id="${id}"]`);
         if (clinicRow) {
-            clinicRow.querySelector('td:nth-child(2)').textContent = name;
-            clinicRow.querySelector('td:nth-child(3)').textContent = specialization;
-            clinicRow.querySelector('td:nth-child(4)').textContent = location;
-            clinicRow.querySelector('td:nth-child(5)').textContent = phone;
+            const name = clinicRow.querySelector('td:nth-child(2)').textContent;
+            const specialization = clinicRow.querySelector('td:nth-child(3)').textContent;
+            const location = clinicRow.querySelector('td:nth-child(4)').textContent;
+            const phone = clinicRow.querySelector('td:nth-child(5)').textContent;
             
-            showNotification('Healthcare Facility updated successfully', 'success');
-            const modalElement = document.getElementById('clinicEditModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) modal.hide();
+            // Update modal
+            document.getElementById('clinic-detail-name').textContent = name;
+            document.getElementById('clinic-detail-specialization').textContent = specialization;
+            document.getElementById('clinic-detail-location').textContent = location;
+            document.getElementById('clinic-detail-phone').textContent = phone;
+            document.getElementById('clinic-detail-id').textContent = id;
+            
+            // Show modal using Bootstrap
+            const modalElement = document.getElementById('clinicDetailsModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            alert('Healthcare facility not found');
         }
-    } else {
-        form.reportValidity();
+    } catch (error) {
+        console.error('Error showing healthcare facility details:', error);
+        alert('Error: ' + error.message);
+    }
+};
+
+window.editClinic = function(id) {
+    try {
+        const clinicRow = document.querySelector(`#clinics-table tr[data-id="${id}"]`);
+        if (clinicRow) {
+            const name = clinicRow.querySelector('td:nth-child(2)').textContent;
+            const specialization = clinicRow.querySelector('td:nth-child(3)').textContent;
+            const location = clinicRow.querySelector('td:nth-child(4)').textContent;
+            const phone = clinicRow.querySelector('td:nth-child(5)').textContent;
+            
+            // Pre-fill form
+            document.getElementById('edit-clinic-id').value = id;
+            document.getElementById('edit-clinic-name').value = name;
+            document.getElementById('edit-clinic-specialization').value = specialization;
+            document.getElementById('edit-clinic-location').value = location;
+            document.getElementById('edit-clinic-phone').value = phone;
+            
+            // Show modal using Bootstrap
+            const modalElement = document.getElementById('clinicEditModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            alert('Healthcare facility not found for editing');
+        }
+    } catch (error) {
+        console.error('Error editing healthcare facility:', error);
+        alert('Error: ' + error.message);
+    }
+};
+
+window.toggleProductStatus = function(id) {
+    try {
+        // Toggle product availability
+        const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+        if (productRow) {
+            const statusCell = productRow.querySelector('td:nth-child(6)');
+            const currentStatus = statusCell.querySelector('.badge').textContent;
+            
+            // Toggle status
+            if (currentStatus.includes('In Stock')) {
+                statusCell.innerHTML = '<span class="badge bg-danger">Out of Stock</span>';
+                alert('Product marked as Out of Stock');
+            } else {
+                statusCell.innerHTML = '<span class="badge bg-success">In Stock</span>';
+                alert('Product marked as In Stock');
+            }
+        } else {
+            alert('Product not found');
+        }
+    } catch (error) {
+        console.error('Error toggling product status:', error);
+        alert('Error: ' + error.message);
+    }
+};
+
+function saveClinicChanges() {
+    try {
+        const form = document.getElementById('edit-clinic-form');
+        const id = document.getElementById('edit-clinic-id').value;
+        if (form.checkValidity()) {
+            const name = document.getElementById('edit-clinic-name').value;
+            const specialization = document.getElementById('edit-clinic-specialization').value;
+            const location = document.getElementById('edit-clinic-location').value;
+            const phone = document.getElementById('edit-clinic-phone').value;
+            
+            // Update the corresponding row in the table
+            const clinicRow = document.querySelector(`#clinics-table tr[data-id="${id}"]`);
+            if (clinicRow) {
+                clinicRow.querySelector('td:nth-child(2)').textContent = name;
+                clinicRow.querySelector('td:nth-child(3)').textContent = specialization;
+                clinicRow.querySelector('td:nth-child(4)').textContent = location;
+                clinicRow.querySelector('td:nth-child(5)').textContent = phone;
+                
+                alert('Healthcare Facility updated successfully');
+                const modalElement = document.getElementById('clinicEditModal');
+                bootstrap.Modal.getInstance(modalElement).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    } catch (error) {
+        console.error('Error saving healthcare facility:', error);
+        alert('Error: ' + error.message);
     }
 }
 
@@ -1025,41 +1186,63 @@ document.getElementById('generate-inventory-report')?.addEventListener('click', 
 });
 
 // Admin action functions with full implementation
-function viewProductDetails(id) {
-    try {
-        // Get the product details and show in a modal
-        // Find the product in the table
-        const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
-        if (productRow) {
-            const productName = productRow.querySelector('td:nth-child(2)').textContent;
-            const productType = productRow.querySelector('td:nth-child(3)').textContent;
-            const clinic = productRow.querySelector('td:nth-child(4)').textContent;
-            const price = productRow.querySelector('td:nth-child(5)').textContent;
-            
-            // Update modal content
-            document.getElementById('product-detail-name').textContent = productName;
-            document.getElementById('product-detail-type').textContent = productType;
-            document.getElementById('product-detail-clinic').textContent = clinic;
-            document.getElementById('product-detail-price').textContent = price;
-            document.getElementById('product-detail-id').textContent = id;
-            
-            // Get modal and show it
-            const modalElement = document.getElementById('productDetailsModal');
-            if (!modalElement) {
-                alert('Product details modal not found');
-                return;
-            }
-            
-            // Use Bootstrap's native JavaScript API
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        } else {
-            alert('Product details not found');
-        }
-    } catch (error) {
-        console.error('Error showing product details:', error);
-        alert('Error showing product details: ' + error.message);
+// Simple function to show a message with alert since Bootstrap toasts aren't working
+function showMessage(message) {
+    alert(message);
+}
+
+// Function to close any modal
+function closeModal(modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    
+    // Remove backdrop
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+        backdrop.remove();
     }
+}
+
+// View product details function - simplified and direct
+function viewProductDetails(id) {
+    // Find the product in the table
+    const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+    if (!productRow) {
+        showMessage('Product not found');
+        return;
+    }
+    
+    // Get data from the row
+    const productName = productRow.querySelector('td:nth-child(2)').textContent;
+    const productType = productRow.querySelector('td:nth-child(3)').textContent;
+    const clinic = productRow.querySelector('td:nth-child(4)').textContent;
+    const price = productRow.querySelector('td:nth-child(5)').textContent;
+    
+    // Update modal content
+    document.getElementById('product-detail-name').textContent = productName;
+    document.getElementById('product-detail-type').textContent = productType;
+    document.getElementById('product-detail-clinic').textContent = clinic;
+    document.getElementById('product-detail-price').textContent = price;
+    document.getElementById('product-detail-id').textContent = id;
+    
+    // Show the modal with direct DOM access
+    const modal = document.getElementById('productDetailsModal');
+    modal.style.display = 'block';
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+    
+    // Add backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    document.body.appendChild(backdrop);
+    
+    // Add close handlers to all close buttons
+    modal.querySelectorAll('[data-bs-dismiss="modal"]').forEach(button => {
+        button.onclick = function() {
+            closeModal(modal);
+        };
+    });
 }
 
 function editProduct(id) {
