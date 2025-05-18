@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load dashboard data
     loadDashboardStatistics();
     
-    // Create modals for action buttons
-    createActionModals();
+    // Setup event handlers for all button actions
+    setupActionButtonHandlers();
     
     // Setup logout functionality
     document.getElementById('logout-btn').addEventListener('click', function(e) {
@@ -20,6 +20,86 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '/pages/login.html';
     });
 });
+
+// Setup direct event handlers for all modal buttons
+function setupActionButtonHandlers() {
+    // Set up the save button for product edit
+    document.getElementById('save-product-btn')?.addEventListener('click', function() {
+        const form = document.getElementById('edit-product-form');
+        const id = document.getElementById('edit-product-id').value;
+        if (form.checkValidity()) {
+            const name = document.getElementById('edit-product-name').value;
+            const type = document.getElementById('edit-product-type').value;
+            const price = document.getElementById('edit-product-price').value;
+            
+            // Update the corresponding row in the table
+            const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+            if (productRow) {
+                productRow.querySelector('td:nth-child(2)').textContent = name;
+                productRow.querySelector('td:nth-child(3)').textContent = type;
+                productRow.querySelector('td:nth-child(5)').textContent = '$' + parseFloat(price).toFixed(2);
+                
+                showNotification('Product updated successfully', 'success');
+                const modalElement = document.getElementById('productEditModal');
+                bootstrap.Modal.getInstance(modalElement).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    });
+    
+    // Set up the save button for customer edit
+    document.getElementById('save-customer-btn')?.addEventListener('click', function() {
+        const form = document.getElementById('edit-customer-form');
+        const id = document.getElementById('edit-customer-id').value;
+        if (form.checkValidity()) {
+            const name = document.getElementById('edit-customer-name').value;
+            const email = document.getElementById('edit-customer-email').value;
+            const phone = document.getElementById('edit-customer-phone').value;
+            
+            // Update the corresponding row in the table
+            const customerRow = document.querySelector(`#customers-table tr[data-id="${id}"]`);
+            if (customerRow) {
+                customerRow.querySelector('td:nth-child(2)').textContent = name;
+                customerRow.querySelector('td:nth-child(3)').textContent = email;
+                customerRow.querySelector('td:nth-child(4)').textContent = phone;
+                
+                showNotification('Customer updated successfully', 'success');
+                const modalElement = document.getElementById('customerEditModal');
+                bootstrap.Modal.getInstance(modalElement).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    });
+    
+    // Set up the save button for clinic edit
+    document.getElementById('save-clinic-btn')?.addEventListener('click', function() {
+        const form = document.getElementById('edit-clinic-form');
+        const id = document.getElementById('edit-clinic-id').value;
+        if (form.checkValidity()) {
+            const name = document.getElementById('edit-clinic-name').value;
+            const specialization = document.getElementById('edit-clinic-specialization').value;
+            const location = document.getElementById('edit-clinic-location').value;
+            const phone = document.getElementById('edit-clinic-phone').value;
+            
+            // Update the corresponding row in the table
+            const clinicRow = document.querySelector(`#clinics-table tr[data-id="${id}"]`);
+            if (clinicRow) {
+                clinicRow.querySelector('td:nth-child(2)').textContent = name;
+                clinicRow.querySelector('td:nth-child(3)').textContent = specialization;
+                clinicRow.querySelector('td:nth-child(4)').textContent = location;
+                clinicRow.querySelector('td:nth-child(5)').textContent = phone;
+                
+                showNotification('Clinic updated successfully', 'success');
+                const modalElement = document.getElementById('clinicEditModal');
+                bootstrap.Modal.getInstance(modalElement).hide();
+            }
+        } else {
+            form.reportValidity();
+        }
+    });
+}
 
 // Create all needed modals at initialization
 function createActionModals() {
@@ -938,27 +1018,39 @@ document.getElementById('generate-inventory-report')?.addEventListener('click', 
 
 // Admin action functions with full implementation
 function viewProductDetails(id) {
-    // Get the product details and show in a modal
-    // Find the product in the table
-    const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
-    if (productRow) {
-        const productName = productRow.querySelector('td:nth-child(2)').textContent;
-        const productType = productRow.querySelector('td:nth-child(3)').textContent;
-        const clinic = productRow.querySelector('td:nth-child(4)').textContent;
-        const price = productRow.querySelector('td:nth-child(5)').textContent;
-        
-        // Update modal content
-        document.getElementById('product-detail-name').textContent = productName;
-        document.getElementById('product-detail-type').textContent = productType;
-        document.getElementById('product-detail-clinic').textContent = clinic;
-        document.getElementById('product-detail-price').textContent = price;
-        document.getElementById('product-detail-id').textContent = id;
-        
-        const modalElement = document.getElementById('productDetailsModal');
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-    } else {
-        showNotification('Product details not found', 'error');
+    try {
+        // Get the product details and show in a modal
+        // Find the product in the table
+        const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
+        if (productRow) {
+            const productName = productRow.querySelector('td:nth-child(2)').textContent;
+            const productType = productRow.querySelector('td:nth-child(3)').textContent;
+            const clinic = productRow.querySelector('td:nth-child(4)').textContent;
+            const price = productRow.querySelector('td:nth-child(5)').textContent;
+            
+            // Update modal content
+            document.getElementById('product-detail-name').textContent = productName;
+            document.getElementById('product-detail-type').textContent = productType;
+            document.getElementById('product-detail-clinic').textContent = clinic;
+            document.getElementById('product-detail-price').textContent = price;
+            document.getElementById('product-detail-id').textContent = id;
+            
+            // Get modal and show it
+            const modalElement = document.getElementById('productDetailsModal');
+            if (!modalElement) {
+                alert('Product details modal not found');
+                return;
+            }
+            
+            // Use Bootstrap's native JavaScript API
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            alert('Product details not found');
+        }
+    } catch (error) {
+        console.error('Error showing product details:', error);
+        alert('Error showing product details: ' + error.message);
     }
 }
 

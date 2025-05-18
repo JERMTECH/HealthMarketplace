@@ -924,6 +924,174 @@
         </div>
     </div>
 
+    <!-- Product Details Modal -->
+    <div class="modal fade" id="productDetailsModal" tabindex="-1" aria-labelledby="productDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="productDetailsModalLabel">Product Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Name:</strong> <span id="product-detail-name"></span></p>
+                    <p><strong>Type:</strong> <span id="product-detail-type"></span></p>
+                    <p><strong>Clinic:</strong> <span id="product-detail-clinic"></span></p>
+                    <p><strong>Price:</strong> <span id="product-detail-price"></span></p>
+                    <p><strong>ID:</strong> <span id="product-detail-id"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Edit Modal -->
+    <div class="modal fade" id="productEditModal" tabindex="-1" aria-labelledby="productEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="productEditModalLabel">Edit Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-product-form">
+                        <input type="hidden" id="edit-product-id">
+                        <div class="mb-3">
+                            <label for="edit-product-name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="edit-product-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-product-type" class="form-label">Type</label>
+                            <input type="text" class="form-control" id="edit-product-type" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-product-price" class="form-label">Price</label>
+                            <input type="number" class="form-control" id="edit-product-price" step="0.01" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-product-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Details Modal -->
+    <div class="modal fade" id="customerDetailsModal" tabindex="-1" aria-labelledby="customerDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="customerDetailsModalLabel">Customer Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Name:</strong> <span id="customer-detail-name"></span></p>
+                    <p><strong>Email:</strong> <span id="customer-detail-email"></span></p>
+                    <p><strong>Phone:</strong> <span id="customer-detail-phone"></span></p>
+                    <p><strong>ID:</strong> <span id="customer-detail-id"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Edit Modal -->
+    <div class="modal fade" id="customerEditModal" tabindex="-1" aria-labelledby="customerEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="customerEditModalLabel">Edit Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-customer-form">
+                        <input type="hidden" id="edit-customer-id">
+                        <div class="mb-3">
+                            <label for="edit-customer-name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="edit-customer-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-customer-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="edit-customer-email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-customer-phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="edit-customer-phone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="save-customer-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clinic Details Modal -->
+    <div class="modal fade" id="clinicDetailsModal" tabindex="-1" aria-labelledby="clinicDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="clinicDetailsModalLabel">Healthcare Facility Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Name:</strong> <span id="clinic-detail-name"></span></p>
+                    <p><strong>Specialization:</strong> <span id="clinic-detail-specialization"></span></p>
+                    <p><strong>Location:</strong> <span id="clinic-detail-location"></span></p>
+                    <p><strong>Phone:</strong> <span id="clinic-detail-phone"></span></p>
+                    <p><strong>ID:</strong> <span id="clinic-detail-id"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clinic Edit Modal -->
+    <div class="modal fade" id="clinicEditModal" tabindex="-1" aria-labelledby="clinicEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="clinicEditModalLabel">Edit Healthcare Facility</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-clinic-form">
+                        <input type="hidden" id="edit-clinic-id">
+                        <div class="mb-3">
+                            <label for="edit-clinic-name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="edit-clinic-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-clinic-specialization" class="form-label">Specialization</label>
+                            <input type="text" class="form-control" id="edit-clinic-specialization" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-clinic-location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="edit-clinic-location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-clinic-phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="edit-clinic-phone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="save-clinic-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container for Notifications -->
     <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
