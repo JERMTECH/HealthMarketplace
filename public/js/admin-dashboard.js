@@ -852,10 +852,10 @@ async function loadCustomers() {
                     <td>${patientDOB}</td>
                     <td>${formatDate(patientCreatedAt)}</td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-1 view-customer-btn" data-customer-id="${patientId}">
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="window.AdminActions.viewCustomerProfile('${patientId}')">
                             <i class="bi bi-eye"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary edit-customer-btn" data-customer-id="${patientId}">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.AdminActions.editCustomer('${patientId}')">
                             <i class="bi bi-pencil"></i>
                         </button>
                     </td>
@@ -864,21 +864,6 @@ async function loadCustomers() {
         });
         
         customersTable.innerHTML = html;
-        
-        // Add event listeners to the newly created buttons
-        document.querySelectorAll('.view-customer-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-customer-id');
-                viewCustomerProfile(id);
-            });
-        });
-        
-        document.querySelectorAll('.edit-customer-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-customer-id');
-                editCustomer(id);
-            });
-        });
         
     } catch (error) {
         console.error('Error loading customers:', error);
@@ -916,10 +901,10 @@ async function loadClinics() {
                     <td>${clinic.phone || 'N/A'}</td>
                     <td>${status}</td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-1 view-clinic-btn" data-clinic-id="${clinic.id}">
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="window.AdminActions.viewClinicProfile('${clinic.id}')">
                             <i class="bi bi-eye"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary edit-clinic-btn" data-clinic-id="${clinic.id}">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.AdminActions.editClinic('${clinic.id}')">
                             <i class="bi bi-pencil"></i>
                         </button>
                     </td>
@@ -928,21 +913,6 @@ async function loadClinics() {
         });
         
         clinicsTable.innerHTML = html;
-        
-        // Add event listeners to the newly created buttons
-        document.querySelectorAll('.view-clinic-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-clinic-id');
-                viewClinicProfile(id);
-            });
-        });
-        
-        document.querySelectorAll('.edit-clinic-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-clinic-id');
-                editClinic(id);
-            });
-        });
         
         // Populate specialization filter
         populateSpecializationFilter(clinics);
