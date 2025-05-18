@@ -744,7 +744,7 @@ async function loadProducts() {
                 '<span class="badge bg-success">In Stock</span>' : 
                 '<span class="badge bg-danger">Out of Stock</span>';
             
-            // Using direct inline onclick handlers for simplicity and reliability
+            // Use simple function calls for buttons
             html += `
                 <tr data-id="${product.id}">
                     <td>${product.id.substring(0, 8)}...</td>
@@ -755,15 +755,15 @@ async function loadProducts() {
                     <td>${status}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-outline-primary me-1" 
-                            onclick="showProductDetails('${product.id}', '${product.name}', 'Product', '${product.clinic ? product.clinic.name.replace(/'/g, "\\'") : 'N/A'}', '$${parseFloat(product.price).toFixed(2)}')">
+                            onclick="alert('View product: ' + '${product.name.replace(/'/g, "\\'")}')">
                             <i class="bi bi-eye"></i>
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-secondary me-1"
-                            onclick="showProductEdit('${product.id}', '${product.name.replace(/'/g, "\\'")}', 'Product', '${parseFloat(product.price).toFixed(2)}')">
+                            onclick="alert('Edit product: ' + '${product.name.replace(/'/g, "\\'")}')">
                             <i class="bi bi-pencil"></i>
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-danger"
-                            onclick="toggleProductStatus('${product.id}', ${product.in_stock})">
+                            onclick="alert('Toggle status for: ' + '${product.name.replace(/'/g, "\\'")}')">
                             <i class="bi bi-power"></i>
                         </button>
                     </td>
