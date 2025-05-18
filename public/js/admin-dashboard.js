@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Global window-level functions to handle actions directly from onclick attributes
-window.viewProductDetails = function(id) {
+// Global functions to handle actions directly from onclick attributes
+function viewProductDetails(id) {
     try {
         const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
         if (productRow) {
@@ -59,9 +59,9 @@ window.viewProductDetails = function(id) {
         console.error('Error showing product details:', error);
         alert('Error: ' + error.message);
     }
-};
+}
 
-window.editProduct = function(id) {
+function editProduct(id) {
     try {
         const productRow = document.querySelector(`#products-table tr[data-id="${id}"]`);
         if (productRow) {
@@ -86,7 +86,7 @@ window.editProduct = function(id) {
         console.error('Error editing product:', error);
         alert('Error: ' + error.message);
     }
-};
+}
 
 // Functions to save changes for each form type
 function saveProductChanges() {
