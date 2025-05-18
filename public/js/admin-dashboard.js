@@ -409,7 +409,7 @@ async function loadProducts() {
                 '<span class="badge bg-danger">Out of Stock</span>';
             
             html += `
-                <tr>
+                <tr data-id="${product.id}">
                     <td>${product.id.substring(0, 8)}...</td>
                     <td>${product.name}</td>
                     <td>Product</td>
@@ -720,7 +720,7 @@ async function loadRewardData() {
             const membershipLevel = getMembershipLevel(user.totalPoints);
             
             html += `
-                <tr>
+                <tr data-id="${user.patientId}">
                     <td>${user.name}</td>
                     <td>${user.totalPoints}</td>
                     <td>${user.redeemedPoints}</td>
@@ -770,7 +770,7 @@ async function loadPartnerShops() {
                 partner.categories.map(cat => cat.name).join(', ') : 'N/A';
             
             html += `
-                <tr>
+                <tr data-id="${partner.id}">
                     <td>${partner.name}</td>
                     <td>${partner.location || 'N/A'}</td>
                     <td>${categories}</td>
