@@ -39,8 +39,7 @@ async def get_patients(
     if not is_admin(current_user) and current_user.type != "clinic":
         raise HTTPException(status_code=403, detail="Not authorized to view all patients")
     
-    # Using sample data for dashboard to avoid schema validation issues
-    patients = []
+    patients_response_data = []
     
     # Join with user table to get names and emails
     patient_records = db.query(Patient, User).join(User, User.id == Patient.id).all()
@@ -53,72 +52,13 @@ async def get_patients(
             "phone": patient.phone,
             "address": patient.address,
             "date_of_birth": patient.date_of_birth,
-            "created_at": str(patient.created_at),
-            "updated_at": str(patient.updated_at) if patient.updated_at else None
+            "is_active": user.is_active, # Include is_active status
+            "created_at": patient.created_at.isoformat() if patient.created_at else None,
+            "updated_at": patient.updated_at.isoformat() if patient.updated_at else None
         }
-        patients.append(patient_data)
+        patients_response_data.append(patient_data)
         
-    # If we couldn't get any patients, return some sample data
-    if not patients:
-        patients = [
-            {
-                "id": "pat-001",
-                "name": "John Smith",
-                "email": "john.smith@example.com",
-                "phone": "555-123-4567",
-                "address": "123 Main St, Anytown, CA",
-                "date_of_birth": "1980-05-15",
-                "created_at": "2025-01-10T09:30:00",
-                "updated_at": "2025-04-05T14:45:00",
-                "is_active": True
-            },
-            {
-                "id": "pat-002",
-                "name": "Emma Johnson",
-                "email": "emma.j@example.com",
-                "phone": "555-987-6543",
-                "address": "456 Oak Ave, Somewhere, NY",
-                "date_of_birth": "1992-08-22",
-                "created_at": "2025-02-15T10:15:00",
-                "updated_at": "2025-03-20T11:30:00",
-                "is_active": True
-            },
-            {
-                "id": "pat-003",
-                "name": "Michael Brown",
-                "email": "mbrown@example.com",
-                "phone": "555-456-7890",
-                "address": "789 Pine Rd, Elsewhere, TX",
-                "date_of_birth": "1975-11-03",
-                "created_at": "2025-01-05T08:00:00",
-                "updated_at": "2025-04-10T16:20:00",
-                "is_active": True
-            },
-            {
-                "id": "pat-004",
-                "name": "Sarah Wilson",
-                "email": "sarah.w@example.com",
-                "phone": "555-222-3333",
-                "address": "101 Maple Dr, Anystate, FL",
-                "date_of_birth": "1988-04-17",
-                "created_at": "2025-03-05T14:45:00",
-                "updated_at": "2025-04-15T09:30:00",
-                "is_active": False
-            },
-            {
-                "id": "pat-005",
-                "name": "David Garcia",
-                "email": "david.g@example.com",
-                "phone": "555-444-7777",
-                "address": "202 Elm St, Somewhere, CA",
-                "date_of_birth": "1965-09-28",
-                "created_at": "2025-02-20T16:15:00",
-                "updated_at": "2025-04-01T11:45:00",
-                "is_active": True
-            }
-        ]
-    
-    return patients
+    return patients_response_data
 
 # Get a specific patient
 @router.get("/{patient_id}", response_model=PatientResponse)
@@ -163,10 +103,13 @@ async def update_patient(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # Check if user is authorized
-    if current_user.id != patient_id:
-        raise HTTPException(status_code=403, detail="Not authorized to update this patient")
-    
+    # Authorization: Patient can update self, or Admin can update any patient
+    is_patient_self = (current_user.id == patient_id and current_user.type == "patient")
+    is_system_admin = is_admin(current_user)
+
+    if not (is_patient_self or is_system_admin):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to update this patient's profile")
+
     patient = db.query(Patient).filter(Patient.id == patient_id).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
@@ -176,12 +119,31 @@ async def update_patient(
         setattr(patient, key, value)
     
     # Update user name if it changed
-    if patient_data.name:
-        user = db.query(User).filter(User.id == patient_id).first()
-        if user:
-            user.name = patient_data.name
+    user = db.query(User).filter(User.id == patient_id).first()
+    if not user:
+        # This case should ideally not happen if patient exists, implies data inconsistency
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Associated user data not found for this patient")
+
+    if patient_data.name is not None: # Check if name is part of the update
+        user.name = patient_data.name
     
     db.commit()
     db.refresh(patient)
+    if patient_data.name is not None: # If user was changed, refresh user too
+        db.refresh(user)
     
-    return patient
+    # Construct and return PatientResponse
+    return PatientResponse(
+        id=patient.id,
+        name=user.name, # Use potentially updated name
+        email=user.email, # Email is not updatable via this endpoint
+        phone=patient.phone,
+        address=patient.address,
+        date_of_birth=patient.date_of_birth,
+        created_at=patient.created_at,
+        updated_at=patient.updated_at
+        # is_active is part of PatientResponse schema if it inherits from PatientBase which includes it
+        # However, PatientResponse in schemas/patient.py does not have is_active.
+        # If PatientResponse should have is_active, the schema needs an update.
+        # For now, follow the existing PatientResponse schema.
+    )

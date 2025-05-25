@@ -12,6 +12,9 @@ from app.models.users import User
 from app.schemas.token import TokenData
 
 # Constants for JWT
+# WARNING: THIS DEFAULT SECRET_KEY IS FOR DEVELOPMENT ONLY AND IS INSECURE.
+# IN PRODUCTION, YOU MUST SET THE 'SECRET_KEY' ENVIRONMENT VARIABLE 
+# TO A STRONG, UNIQUE, AND RANDOMLY GENERATED STRING.
 SECRET_KEY = os.environ.get("SECRET_KEY", "medimarket-secret-key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
