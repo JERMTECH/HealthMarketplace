@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, distinct, desc
 from typing import List, Dict, Any
 import uuid
@@ -17,7 +17,8 @@ from app.schemas.product import (
     ProductResponse,
     ProductUpdate,
     ProductCategory,
-    OrderCreate,
+    # OrderCreate, # We are using UserOrderCreate now
+    UserOrderCreate, # Renamed for clarity
     OrderResponse,
     OrderItemCustomResponse
 )
@@ -65,109 +66,35 @@ async def get_admin_orders(
     # Check if admin
     if not is_admin(current_user):
         raise HTTPException(status_code=403, detail="Not authorized to access this resource")
+
+    db_orders = db.query(Order).options(
+        joinedload(Order.patient).joinedload(Patient.user),
+        joinedload(Order.items).joinedload(OrderItem.product)
+    ).order_by(Order.created_at.desc()).all()
+
+    response_orders = []
+    for order in db_orders:
+        order_items_data = []
+        for item in order.items:
+            order_items_data.append({
+                "id": item.id,
+                "name": item.product.name if item.product else "Unknown Product",
+                "quantity": item.quantity,
+                "price": item.price
+            })
+        
+        response_orders.append({
+            "id": order.id,
+            "patient_id": order.patient_id,
+            "patient_name": order.patient.user.name if order.patient and order.patient.user else "Unknown Patient",
+            "total": order.total,
+            "status": order.status,
+            "points_earned": order.points_earned,
+            "created_at": order.created_at.isoformat() if order.created_at else None,
+            "items": order_items_data
+        })
     
-    # Return sample order data for admin dashboard
-    orders = [
-        {
-            "id": "ord-001",
-            "patient_id": "pat-001",
-            "patient_name": "John Smith",
-            "total": "75.99",
-            "status": "delivered",
-            "points_earned": "76",
-            "created_at": "2025-04-10T09:30:00",
-            "items": [
-                {
-                    "id": "item-001",
-                    "name": "Vitamin D Supplements",
-                    "quantity": "1",
-                    "price": "25.99"
-                },
-                {
-                    "id": "item-002",
-                    "name": "Blood Pressure Monitor",
-                    "quantity": "1",
-                    "price": "50.00"
-                }
-            ]
-        },
-        {
-            "id": "ord-002",
-            "patient_id": "pat-002",
-            "patient_name": "Emma Johnson",
-            "total": "120.50",
-            "status": "processing",
-            "points_earned": "121",
-            "created_at": "2025-05-15T14:45:00",
-            "items": [
-                {
-                    "id": "item-003",
-                    "name": "Monthly Medication Pack",
-                    "quantity": "1",
-                    "price": "120.50"
-                }
-            ]
-        },
-        {
-            "id": "ord-003",
-            "patient_id": "pat-003",
-            "patient_name": "Michael Brown",
-            "total": "45.75",
-            "status": "shipped",
-            "points_earned": "46",
-            "created_at": "2025-05-10T11:20:00",
-            "items": [
-                {
-                    "id": "item-004",
-                    "name": "First Aid Kit",
-                    "quantity": "1",
-                    "price": "45.75"
-                }
-            ]
-        },
-        {
-            "id": "ord-004",
-            "patient_id": "pat-001",
-            "patient_name": "John Smith",
-            "total": "87.25",
-            "status": "cancelled",
-            "points_earned": "0",
-            "created_at": "2025-05-05T16:30:00",
-            "items": [
-                {
-                    "id": "item-005",
-                    "name": "Digital Thermometer",
-                    "quantity": "1",
-                    "price": "22.50"
-                },
-                {
-                    "id": "item-006",
-                    "name": "Pain Relief Medication",
-                    "quantity": "2",
-                    "price": "32.50"
-                }
-            ]
-        },
-        {
-            "id": "ord-005",
-            "patient_id": "pat-002",
-            "patient_name": "Emma Johnson",
-            "total": "135.99",
-            "status": "delivered",
-            "points_earned": "136",
-            "created_at": "2025-04-25T10:15:00",
-            "items": [
-                {
-                    "id": "item-007",
-                    "name": "Insulin Kit",
-                    "quantity": "1",
-                    "price": "135.99"
-                }
-            ]
-        }
-    ]
-    
-    return orders
+    return response_orders
 
 # Get recent orders for admin dashboard
 @router.get("/orders/recent")
@@ -179,75 +106,37 @@ async def get_recent_orders(
     # Check if admin
     if not is_admin(current_user):
         raise HTTPException(status_code=403, detail="Not authorized to access this resource")
-    
-    # Return sample order data for the dashboard
-    recent_orders = [
-        {
-            "id": "ord-001",
+
+    db_orders = db.query(Order).options(
+        joinedload(Order.patient).joinedload(Patient.user),
+        joinedload(Order.items).joinedload(OrderItem.product)
+    ).order_by(Order.created_at.desc()).limit(limit).all()
+
+    response_orders = []
+    for order in db_orders:
+        order_items_data = []
+        for item in order.items:
+            order_items_data.append({
+                "id": item.id,
+                "name": item.product.name if item.product else "Unknown Product",
+                "quantity": item.quantity,
+                "price": item.price
+            })
+        
+        response_orders.append({
+            "id": order.id,
             "patient": {
-                "id": "pat-001",
-                "name": "John Smith"
+                "id": order.patient_id,
+                "name": order.patient.user.name if order.patient and order.patient.user else "Unknown Patient"
             },
-            "total": "75.99",
-            "status": "delivered",
-            "points_earned": "76",
-            "created_at": "2025-04-10T09:30:00",
-            "items": [
-                {
-                    "id": "item-001",
-                    "name": "Vitamin D Supplements",
-                    "quantity": "1",
-                    "price": "25.99"
-                },
-                {
-                    "id": "item-002",
-                    "name": "Blood Pressure Monitor",
-                    "quantity": "1",
-                    "price": "50.00"
-                }
-            ]
-        },
-        {
-            "id": "ord-002",
-            "patient": {
-                "id": "pat-002",
-                "name": "Emma Johnson"
-            },
-            "total": "120.50",
-            "status": "processing",
-            "points_earned": "121",
-            "created_at": "2025-05-15T14:45:00",
-            "items": [
-                {
-                    "id": "item-003",
-                    "name": "Monthly Medication Pack",
-                    "quantity": "1",
-                    "price": "120.50"
-                }
-            ]
-        },
-        {
-            "id": "ord-003",
-            "patient": {
-                "id": "pat-003",
-                "name": "Michael Brown"
-            },
-            "total": "45.75",
-            "status": "shipped",
-            "points_earned": "46",
-            "created_at": "2025-05-10T11:20:00",
-            "items": [
-                {
-                    "id": "item-004",
-                    "name": "First Aid Kit",
-                    "quantity": "1",
-                    "price": "45.75"
-                }
-            ]
-        }
-    ]
-    
-    return recent_orders[:limit]
+            "total": order.total,
+            "status": order.status,
+            "points_earned": order.points_earned,
+            "created_at": order.created_at.isoformat() if order.created_at else None,
+            "items": order_items_data
+        })
+        
+    return response_orders
 
 # Get all orders for admin
 @router.get("/orders/all", response_model=List[OrderResponse])
@@ -259,8 +148,41 @@ async def get_all_orders(
     if not is_admin(current_user):
         raise HTTPException(status_code=403, detail="Not authorized to access this resource")
     
-    orders = db.query(Order).all()
-    return orders
+    db_orders = db.query(Order).options(
+        joinedload(Order.patient).joinedload(Patient.user), # For patient_name if needed by OrderResponse indirectly or future use
+        joinedload(Order.items).joinedload(OrderItem.product), # For items
+        joinedload(Order.prescription).joinedload(Prescription.clinic).joinedload(Clinic.user) # For clinic_name
+    ).order_by(Order.created_at.desc()).all()
+
+    response_orders = []
+    for order in db_orders:
+        items_response = []
+        for item in order.items:
+            items_response.append(OrderItemCustomResponse(
+                id=item.id,
+                product_id=item.product_id,
+                name=item.product.name if item.product else "Unknown Product",
+                quantity=item.quantity,
+                price=item.price
+            ))
+
+        clinic_name = None
+        if order.prescription and order.prescription.clinic and order.prescription.clinic.user:
+            clinic_name = order.prescription.clinic.user.name
+        
+        response_orders.append(OrderResponse(
+            id=order.id,
+            patient_id=order.patient_id,
+            prescription_id=order.prescription_id,
+            total=order.total,
+            status=order.status,
+            points_earned=order.points_earned,
+            date=order.created_at.isoformat() if order.created_at else None,
+            items=items_response,
+            clinic_name=clinic_name
+        ))
+        
+    return response_orders
 
 # Get patient orders
 @router.get("/orders/patient/{patient_id}", response_model=List[OrderResponse])
@@ -435,161 +357,119 @@ async def delete_product(
     
     return None
 
-# Create an order with simplified validation
+# Create an order
 @router.post("/order", response_model=OrderResponse)
 async def create_order(
-    order_data: dict,
+    order_data: UserOrderCreate, # Use the new Pydantic model
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     # Check if patient
     if current_user.type != "patient":
-        raise HTTPException(status_code=403, detail="Only patients can create orders")
-    
-    # Always use current user ID for security
-    patient_id = current_user.id
-    
-    # Extract items from the order data, with validation and fallbacks
-    if "items" not in order_data or not order_data["items"]:
-        raise HTTPException(status_code=400, detail="Order must contain items")
-    
-    items = order_data.get("items", [])
-    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only patients can create orders")
+
+    if not order_data.items:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Order must contain items")
+
     # Extract product IDs from items
-    product_ids = []
-    for item in items:
-        if isinstance(item, dict) and "product_id" in item:
-            product_ids.append(item["product_id"])
-            
+    product_ids = [item.product_id for item in order_data.items]
     if not product_ids:
-        raise HTTPException(status_code=400, detail="No valid products found in order")
-    
-    # Get products
-    products = db.query(Product).filter(Product.id.in_(product_ids)).all()
-    
-    if len(products) == 0:
-        raise HTTPException(status_code=400, detail="No valid products found in database")
-    
-    # Calculate total
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No product IDs found in order items")
+
+    # Get products from DB
+    products_from_db = db.query(Product).filter(Product.id.in_(product_ids)).all()
+    products_map = {p.id: p for p in products_from_db}
+
+    if len(products_from_db) != len(set(product_ids)):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="One or more products not found or duplicated")
+
     total = 0.0
-    for item in items:
-        if not isinstance(item, dict) or "product_id" not in item:
-            continue
-            
-        product = next((p for p in products if p.id == item["product_id"]), None)
-        if product:
-            try:
-                item_quantity = int(item.get("quantity", "1"))
-                item_total = float(product.price) * item_quantity
-                total += item_total
-            except (ValueError, TypeError):
-                # Use default values if conversion fails
-                item_total = float(product.price)
-                total += item_total
-    
-    # Simplify order creation for maximum reliability
-    # Generate a unique ID for the new order
+    order_items_to_create = []
+
+    for item_data in order_data.items:
+        product = products_map.get(item_data.product_id)
+        if not product: # Should not happen if previous check is done correctly
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {item_data.product_id} not found")
+
+        try:
+            item_quantity = int(item_data.quantity)
+            if item_quantity <= 0:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Quantity for product {product.name} must be positive.")
+        except ValueError:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid quantity format for product {product.name}.")
+
+        try:
+            product_price = float(product.price)
+        except ValueError:
+            # This indicates bad data in the database for product price
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Invalid price format for product {product.name} in database.")
+        
+        item_total = product_price * item_quantity
+        total += item_total
+        
+        order_items_to_create.append(OrderItem(
+            id=str(uuid.uuid4()),
+            product_id=item_data.product_id,
+            quantity=str(item_quantity), # Store quantity as string as per schema
+            price=str(product_price) # Store price at the time of order as string
+        ))
+
+    # Create the Order record
     order_id = str(uuid.uuid4())
-    
-    # Create the order record with just the essential fields
-    # Always use authenticated user's ID and handle None values
     order = Order(
         id=order_id,
-        patient_id=current_user.id,  # Use the authenticated user ID
-        prescription_id=None,  # No prescription needed for basic orders
-        total=str(total),
-        status="processing",
-        points_earned=str(int(total * 10))  # 10 points per dollar
+        patient_id=current_user.id,
+        prescription_id=order_data.prescription_id,
+        total=str(total), # Store total as string
+        status="processing", # Default status
+        points_earned=str(int(total * 10)) # Ensure total is float for calculation
     )
-    
     db.add(order)
-    
-    # Calculate reward points (10 points per dollar)
-    points_earned = int(total * 10)
-    
-    # Add reward points - use current_user.id to avoid patient_id validation errors
+
+    # Link OrderItems to the Order and add to session
+    for oi_model in order_items_to_create:
+        oi_model.order_id = order_id
+        db.add(oi_model)
+
+    # Add reward points
+    points_earned_val = int(total * 10)
     reward_point = RewardPoint(
         id=str(uuid.uuid4()),
         patient_id=current_user.id,
-        points=str(points_earned),
-        description=f"Order placed successfully",
-        source_id=order.id,
+        points=str(points_earned_val),
+        description="Order placed successfully",
+        source_id=order_id,
         type="earned"
     )
-    
     db.add(reward_point)
-    
-    # Create order items - using items from dictionary, not calling items() method
-    order_items = []
-    # Make sure we're using the items list, not calling the items() method on the dict
-    items_list = order_data["items"] if "items" in order_data else []
-    
-    for item_data in items_list:
-        if not isinstance(item_data, dict) or "product_id" not in item_data:
-            continue
-            
-        product_id = item_data.get("product_id")
-        quantity = item_data.get("quantity", "1")
-        
-        product = next((p for p in products if p.id == product_id), None)
-        
-        if product:
-            order_item = OrderItem(
-                id=str(uuid.uuid4()),
-                order_id=order.id,
-                product_id=product_id,
-                quantity=quantity, 
-                price=product.price
-            )
-            
-            db.add(order_item)
-            order_items.append(order_item)
-    
+
     db.commit()
+    db.refresh(order) # Refresh to get DB-generated values like created_at
     
-    # Refresh order to get updated relationships
-    db.refresh(order)
-    
-    # Prepare response
+    # Refresh order items to get their DB-generated values
+    for oi_model in order_items_to_create:
+        db.refresh(oi_model)
+
+    # Prepare response using Pydantic models
     response_items = []
-    for item in order_items:
-        product = next((p for p in products if p.id == item.product_id), None)
-        item_dict = {
-            "id": item.id,
-            "order_id": item.order_id,
-            "product_id": item.product_id,
-            "quantity": item.quantity,
-            "price": item.price,
-            "product_name": product.name if product else None,
-            "created_at": item.created_at
-        }
-        response_items.append(item_dict)
-    
-    # Simply create a dictionary matching our response format
-    # This avoids Pydantic validation issues with Column objects
-    custom_items = []
-    for item in response_items:
-        custom_items.append({
-            "id": str(item["id"]),
-            "product_id": str(item["product_id"]),
-            "name": str(item["product_name"] or "Unknown Product"),
-            "quantity": str(item["quantity"]),
-            "price": str(item["price"])
-        })
-    
-    # Current date in the correct format
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    
-    # Dictionary that matches OrderResponse model
-    order_response = {
-        "id": str(order.id),
-        "patient_id": str(order.patient_id),
-        "prescription_id": str(order.prescription_id) if order.prescription_id else None,
-        "total": str(order.total),
-        "status": str(order.status),
-        "points_earned": str(order.points_earned),
-        "date": current_date,
-        "items": custom_items
-    }
-    
-    return order_response
+    for oi_model in order_items_to_create:
+        product = products_map.get(oi_model.product_id)
+        response_items.append(OrderItemCustomResponse(
+            id=oi_model.id,
+            product_id=oi_model.product_id,
+            name=product.name if product else "Unknown Product",
+            quantity=oi_model.quantity,
+            price=oi_model.price
+        ))
+
+    return OrderResponse(
+        id=order.id,
+        patient_id=order.patient_id,
+        prescription_id=order.prescription_id,
+        total=order.total,
+        status=order.status,
+        points_earned=order.points_earned,
+        date=order.created_at.isoformat() if order.created_at else datetime.now().isoformat(), # Populate date
+        items=response_items,
+        clinic_name=None # clinic_name is not applicable here
+    )
