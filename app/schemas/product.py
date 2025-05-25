@@ -53,19 +53,24 @@ class OrderItemResponse(OrderItemBase):
         orm_mode = True
 
 class OrderBase(BaseModel):
-    patient_id: str
+    # patient_id: str # This will be derived from current_user.id
     items: List[OrderItemCreate]
     prescription_id: Optional[str] = None
 
-class OrderCreate(OrderBase):
+class OrderCreate(OrderBase): # This schema will be used by the endpoint
     pass
+
+# New schema for creating an order, omitting patient_id
+class UserOrderCreate(BaseModel):
+    items: List[OrderItemCreate]
+    prescription_id: Optional[str] = None
 
 class OrderItemCustomResponse(BaseModel):
     id: str
     product_id: str
-    name: str
+    name: str # Should be product.name
     quantity: str
-    price: str
+    price: str # Price of the product at the time of order
 
 class OrderResponse(BaseModel):
     id: str
