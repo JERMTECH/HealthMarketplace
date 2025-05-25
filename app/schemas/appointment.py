@@ -5,6 +5,8 @@ from datetime import datetime
 class AppointmentBase(BaseModel):
     clinic_id: str
     service_id: str
+    # TODO: Consider adding stricter validation for date (e.g., must be in future)
+    # and time (e.g., regex for HH:MM format).
     date: str
     time: str
     notes: Optional[str] = None

@@ -9,7 +9,7 @@ from app.models.users import User
 from app.models.clinics import Clinic
 from app.models.patients import Patient
 from app.schemas.user import UserCreate, UserResponse
-from app.schemas.token import Token
+from app.schemas.token import Token, UserInfo # Import UserInfo
 from app.auth import (
     authenticate_user,
     create_access_token,
@@ -67,7 +67,15 @@ async def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
     # Create access token
     access_token = create_access_token(data={"sub": user_id})
     
-    return {"access_token": access_token, "token_type": "bearer"}
+    # Construct UserInfo for the response
+    user_info = UserInfo(
+        id=db_user.id,
+        name=db_user.name,
+        email=db_user.email,
+        type=db_user.type
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer", "user": user_info}
 
 @router.post("/token", response_model=Token)  # Keep the old endpoint for backwards compatibility
 async def login_for_access_token_form(

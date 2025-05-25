@@ -37,103 +37,71 @@ async def get_clinics_count(
     return {"count": count}
 
 # Get all clinics
-@router.get("/all")
+@router.get("/all") # Consider adding response_model=List[ClinicResponse] or a custom schema
 async def get_all_clinics(db: Session = Depends(get_db)):
-    # Start with sample data that matches the expected format
-    sample_clinics = [
-        {
-            "id": "clinic-001",
-            "name": "Central Health Clinic",
-            "email": "central@example.com",
-            "phone": "555-123-4567",
-            "address": "100 Main St, Cityville",
-            "location": "Cityville",
-            "specialization": "General Practice",
-            "is_active": True,
-            "created_at": "2025-01-15T10:00:00",
-            "updated_at": "2025-04-10T15:30:00",
-            "user": {
-                "id": "clinic-001",
-                "name": "Central Health Clinic",
-                "email": "central@example.com",
-                "is_active": True
-            }
-        },
-        {
-            "id": "clinic-002",
-            "name": "Family Medical Center",
-            "email": "family@example.com",
-            "phone": "555-987-6543",
-            "address": "200 Oak Dr, Townsburg",
-            "location": "Townsburg",
-            "specialization": "Family Medicine",
-            "is_active": True,
-            "created_at": "2025-02-01T09:15:00",
-            "updated_at": "2025-04-05T14:20:00",
-            "user": {
-                "id": "clinic-002",
-                "name": "Family Medical Center",
-                "email": "family@example.com",
-                "is_active": True
-            }
-        },
-        {
-            "id": "clinic-003",
-            "name": "Wellness Specialists",
-            "email": "wellness@example.com",
-            "phone": "555-456-7890",
-            "address": "300 Pine Ave, Healthville",
-            "location": "Healthville",
-            "specialization": "Preventive Care",
-            "is_active": False,
-            "created_at": "2025-01-20T11:30:00",
-            "updated_at": "2025-03-15T16:45:00",
-            "user": {
-                "id": "clinic-003",
-                "name": "Wellness Specialists",
-                "email": "wellness@example.com",
-                "is_active": False
-            }
-        }
-    ]
+    clinics = db.query(Clinic).all()
+    response_data = []
     
-    # Try to get data from database too
-    try:
-        clinics = db.query(Clinic).all()
-        db_results = []
-        
-        for clinic in clinics:
-            # Get the corresponding user to get email and name
-            user = db.query(User).filter(User.id == clinic.id).first()
-            if user:
-                clinic_data = {
-                    "id": clinic.id,
-                    "name": user.name,
-                    "email": user.email,
-                    "phone": clinic.phone,
-                    "address": clinic.address,
-                    "location": clinic.location,
-                    "specialization": clinic.specialization,
-                    "is_active": user.is_active,
-                    "created_at": str(clinic.created_at),
-                    "updated_at": str(clinic.updated_at) if clinic.updated_at else None,
-                    "user": {
-                        "id": user.id,
-                        "name": user.name,
-                        "email": user.email,
-                        "is_active": user.is_active
-                    }
-                }
-                db_results.append(clinic_data)
-        
-        # If we have results from the database, use those
-        if db_results:
-            return db_results
-    except Exception as e:
-        print(f"Error retrieving clinics: {e}")
-    
-    # Return sample data if DB retrieval failed or returned no results
-    return sample_clinics
+    for clinic in clinics:
+        user = db.query(User).filter(User.id == clinic.id).first()
+        if user: # Only include clinic if its associated user exists
+            clinic_data = {
+                "id": clinic.id,
+                "name": user.name, # Name from User model
+                "email": user.email, # Email from User model
+                "phone": clinic.phone,
+                "address": clinic.address,
+                "location": clinic.location,
+                "specialization": clinic.specialization,
+                "is_active": user.is_active, # is_active from User model
+                "created_at": clinic.created_at.isoformat() if clinic.created_at else None,
+                "updated_at": clinic.updated_at.isoformat() if clinic.updated_at else None,
+                # Assuming ClinicResponse schema expects a nested user object for user details
+                # or the main fields are directly part of ClinicResponse.
+                # The current ClinicResponse seems to expect user details flattened.
+                # For now, creating a structure that can be mapped by Pydantic if it expects flattened user fields.
+                # If ClinicResponse expects a nested user, this needs adjustment.
+                # "user": {
+                #     "id": user.id,
+                #     "name": user.name,
+                #     "email": user.email,
+                #     "is_active": user.is_active
+                # }
+                # The provided ClinicResponse schema has name, email directly.
+                # It also has `services: List[ClinicServiceResponse]` which this route is not populating.
+                # For simplicity, this fix focuses on removing sample data and direct DB query.
+                # The original sample data had a nested user, but ClinicResponse doesn't.
+            }
+            # This structure is closer to what ClinicResponse seems to imply
+            # by having 'name' and 'email' at the top level.
+            # Let's create a dictionary matching ClinicResponse fields
+            # This will require ClinicResponse to be able to handle these fields.
+            # The provided ClinicResponse in schemas/clinic.py is:
+            # class ClinicResponse(ClinicBase):
+            # id: str
+            # name: str  <-- from User
+            # email: str <-- from User
+            # services: List[ClinicServiceResponse] = []
+            # created_at: datetime
+            # updated_at: Optional[datetime] = None
+            # class Config: orm_mode = True
+            # So, the constructed dict should be usable by ClinicResponse
+            
+            response_data.append({
+                "id": clinic.id,
+                "name": user.name,
+                "email": user.email,
+                "phone": clinic.phone,
+                "address": clinic.address,
+                "location": clinic.location,
+                "specialization": clinic.specialization,
+                "is_active": user.is_active,
+                "created_at": clinic.created_at, # Pydantic will format it
+                "updated_at": clinic.updated_at, # Pydantic will format it
+                "services": [] # Services are not loaded here, default to empty list
+            })
+            
+    return response_data
 
 # Get featured clinics (for homepage)
 @router.get("/featured", response_model=List[ClinicResponse])
@@ -186,8 +154,10 @@ async def update_clinic(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # Check if user is authorized
-    if current_user.id != clinic_id or current_user.type != "clinic":
+    is_clinic_owner = (current_user.type == "clinic" and current_user.id == clinic_id)
+    is_system_admin = is_admin(current_user) # is_admin helper is defined in this file
+
+    if not (is_clinic_owner or is_system_admin):
         raise HTTPException(status_code=403, detail="Not authorized to update this clinic")
     
     clinic = db.query(Clinic).filter(Clinic.id == clinic_id).first()
@@ -236,19 +206,21 @@ async def get_clinic_services(clinic_id: str, db: Session = Depends(get_db)):
 # Add a clinic service
 @router.post("/services", response_model=ClinicServiceResponse)
 async def add_clinic_service(
-    service_data: ClinicServiceCreate,
-    clinic_id: str,
+    service_data: ClinicServiceCreate, # clinic_id removed from parameters
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    # Check if user is authorized
-    if current_user.id != clinic_id or current_user.type != "clinic":
-        raise HTTPException(status_code=403, detail="Not authorized to add services for this clinic")
+    # Check if user is authorized (must be a clinic)
+    if current_user.type != "clinic":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only clinics can add services")
+    
+    # Derive clinic_id from the authenticated user
+    clinic_id_from_user = current_user.id
     
     # Create service
     service = ClinicService(
         id=str(uuid.uuid4()),
-        clinic_id=clinic_id,
+        clinic_id=clinic_id_from_user, # Use derived clinic_id
         name=service_data.name,
         description=service_data.description,
         price=service_data.price,
