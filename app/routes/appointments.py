@@ -262,8 +262,7 @@ async def update_appointment_status(
         if service and service.price:
             # Add reward points (5 points per dollar for services)
             try:
-                    points_earned = int(float(service.price) * 5) # Assuming 5 points per dollar
-                
+                points_earned = int(float(service.price) * 5) # Assuming 5 points per dollar
                 reward_point = RewardPoint(
                     id=str(uuid.uuid4()),
                     patient_id=appointment.patient_id,

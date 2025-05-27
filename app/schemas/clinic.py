@@ -26,7 +26,7 @@ class ClinicServiceResponse(ClinicServiceBase):
     updated_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ClinicBase(BaseModel):
     name: str
@@ -53,4 +53,4 @@ class ClinicResponse(ClinicBase):
     services: Optional[List[ClinicServiceResponse]] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

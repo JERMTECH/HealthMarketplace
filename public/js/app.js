@@ -1,28 +1,33 @@
-// Main application JavaScript file
+// Main application JavaScript file for the frontend
+// This file handles global UI setup, authentication checks, and homepage logic
+// It is loaded on every page and provides shared utilities and event handlers
 
-// Check if user is logged in on page load
+// When the page loads, run this code
+// This ensures all DOM elements are ready before we try to use them
+// Also initializes icons, checks login status, and loads homepage clinics
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Feather icons
+    // Initialize Feather icons (for pretty SVG icons)
     if (window.feather) {
         feather.replace();
     }
     
-    // Check authentication status and update UI
+    // Check if the user is logged in and update the navigation bar
     checkAuthStatus();
     
-    // Add event listener for logout button
+    // Add a click event to the logout button (if it exists)
     const logoutLink = document.getElementById('logout-link');
     if (logoutLink) {
         logoutLink.addEventListener('click', logout);
     }
     
-    // Load featured clinics on home page
+    // If we're on the homepage, load featured clinics
     if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
         loadFeaturedClinics();
     }
 });
 
-// Function to load featured clinics
+// Loads and displays featured clinics on the homepage
+// Fetches data from the backend and updates the UI
 async function loadFeaturedClinics() {
     try {
         const response = await fetch('/api/clinics/featured');
@@ -39,6 +44,7 @@ async function loadFeaturedClinics() {
             featuredClinicsContainer.innerHTML = '';
             
             if (clinics.length === 0) {
+                // If no clinics, show a friendly message
                 featuredClinicsContainer.innerHTML = `
                     <div class="col-12 text-center py-5">
                         <div class="empty-state">
@@ -55,7 +61,7 @@ async function loadFeaturedClinics() {
                 return;
             }
             
-            // Display featured clinics
+            // For each clinic, create a card and add it to the page
             clinics.forEach(clinic => {
                 const clinicCard = document.createElement('div');
                 clinicCard.className = 'col-md-4 mb-4';
@@ -72,12 +78,13 @@ async function loadFeaturedClinics() {
                 featuredClinicsContainer.appendChild(clinicCard);
             });
             
-            // Re-initialize Feather icons for dynamically added content
+            // Re-initialize Feather icons for new content
             if (window.feather) {
                 feather.replace();
             }
         }
     } catch (error) {
+        // If there's an error, show a message to the user
         console.error('Error loading featured clinics:', error);
         const featuredClinicsContainer = document.getElementById('featured-clinics');
         if (featuredClinicsContainer) {
@@ -92,7 +99,7 @@ async function loadFeaturedClinics() {
     }
 }
 
-// Helper function to escape HTML to prevent XSS
+// Escapes HTML to prevent XSS attacks when displaying user data
 function escapeHtml(unsafe) {
     if (typeof unsafe !== 'string') return '';
     return unsafe
@@ -103,7 +110,7 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 
-// Show error message
+// Show an error message in the UI (auto-hides after 5 seconds)
 function showError(message, elementId = 'error-message') {
     const errorElement = document.getElementById(elementId);
     if (errorElement) {
@@ -119,7 +126,7 @@ function showError(message, elementId = 'error-message') {
     }
 }
 
-// Show success message
+// Show a success message in the UI (auto-hides after 5 seconds)
 function showSuccess(message, elementId = 'success-message') {
     const successElement = document.getElementById(elementId);
     if (successElement) {
@@ -135,25 +142,25 @@ function showSuccess(message, elementId = 'success-message') {
     }
 }
 
-// Format date
+// Format a date string into a readable format
 function formatDate(dateString) {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
-// Format currency
+// Format a number as currency (USD)
 function formatCurrency(amount) {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 }
 
-// Get URL parameters
+// Get a URL parameter by name
 function getUrlParam(param) {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     return urlParams.get(param);
 }
 
-// Set loading state
+// Set a button to a loading state (shows spinner)
 function setLoading(elementId, isLoading) {
     const element = document.getElementById(elementId);
     if (!element) return;
@@ -169,7 +176,7 @@ function setLoading(elementId, isLoading) {
     }
 }
 
-// Initialize loading state for buttons
+// Store the original text for all submit buttons (for loading state)
 function initLoadingButtons() {
     const buttons = document.querySelectorAll('button[type="submit"]');
     buttons.forEach(button => {
@@ -179,5 +186,5 @@ function initLoadingButtons() {
     });
 }
 
-// Call this when the DOM is loaded
+// When the DOM is loaded, initialize loading buttons
 document.addEventListener('DOMContentLoaded', initLoadingButtons);

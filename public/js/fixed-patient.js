@@ -1,3 +1,6 @@
+// Patch or fix for patient-related UI or logic in the frontend
+// Applies bug fixes or enhancements to patient dashboard or profile
+
 // Patient-related functionality
 
 // Load patient profile

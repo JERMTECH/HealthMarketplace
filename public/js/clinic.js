@@ -1,3 +1,6 @@
+// Handles individual clinic page logic for the frontend
+// Loads clinic details, services, and allows booking or viewing information for a specific clinic
+
 // Clinic-related functionality
 
 // Load clinic profile

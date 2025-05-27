@@ -1,3 +1,6 @@
+// Manages the clinics listing page for the frontend
+// Loads and displays a list of clinics, supports searching/filtering, and navigation to clinic details
+
 // Clinics functionality
 
 document.addEventListener('DOMContentLoaded', function() {
