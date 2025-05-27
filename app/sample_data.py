@@ -15,12 +15,10 @@ from app.database import SessionLocal
 def create_initial_data():
     """Create initial data for the healthcare marketplace."""
     db = SessionLocal()
-    
-    # Check if we already have data
-    if db.query(User).count() > 0:
+    # Check if sample data already exists (by unique clinic email)
+    if db.query(User).filter_by(email="cityhealthclinic@example.com").first():
         db.close()
         return
-    
     try:
         # Create clinic users
         clinic_ids = [str(uuid.uuid4()) for _ in range(3)]
@@ -264,6 +262,41 @@ def create_initial_data():
                 )
         
         db.add_all(shop_categories)
+        
+        # Create sample appointments (one per clinic)
+        appointments = [
+            Appointment(
+                id=str(uuid.uuid4()),
+                clinic_id=clinic_ids[0],
+                patient_id=patient_ids[0],
+                service_id=services[0].id,  # General Consultation
+                date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
+                time="10:00",
+                status="confirmed",
+                notes="First appointment for City Health Clinic."
+            ),
+            Appointment(
+                id=str(uuid.uuid4()),
+                clinic_id=clinic_ids[1],
+                patient_id=patient_ids[1],
+                service_id=services[2].id,  # Family Consultation
+                date=(datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d"),
+                time="11:00",
+                status="pending",
+                notes="First appointment for Family Medical Center."
+            ),
+            Appointment(
+                id=str(uuid.uuid4()),
+                clinic_id=clinic_ids[2],
+                patient_id=patient_ids[0],
+                service_id=services[3].id,  # Cardiac Assessment
+                date=(datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d"),
+                time="09:30",
+                status="confirmed",
+                notes="First appointment for Cardio Health Specialists."
+            )
+        ]
+        db.add_all(appointments)
         
         db.commit()
     except Exception as e:

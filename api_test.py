@@ -72,7 +72,7 @@ def test_auth_flow():
     
     # Try to login with sample data credentials
     login_data = {
-        "username": "johndoe@example.com",
+        "username": "cityhealthclinic@example.com",
         "password": "password123"
     }
     
@@ -162,6 +162,23 @@ def test_rewards_system(headers, user):
         else:
             print(f"❌ Failed to get patient rewards: {response.status_code}")
 
+def test_clinic_appointments(headers, user):
+    """Test clinic appointments API"""
+    if not headers or user["type"] != "clinic":
+        print("\nSkipping clinic appointments test (need clinic user)")
+        return
+    
+    print("\nTesting clinic appointments API...")
+    clinic_id = user["id"]
+    
+    # Get clinic appointments
+    response = requests.get(f"{BASE_URL}/api/appointments/clinic/{clinic_id}", headers=headers)
+    if response.status_code == 200:
+        appointments = response.json()
+        print(f"✅ Found {len(appointments)} appointments for clinic")
+    else:
+        print(f"❌ Failed to get clinic appointments: {response.status_code}")
+
 if __name__ == "__main__":
     print("Running API tests for MediMarket...\n")
     
@@ -175,6 +192,7 @@ if __name__ == "__main__":
     # Test endpoints that require auth
     if headers:
         test_patient_appointments(headers, user)
+        test_clinic_appointments(headers, user)
         test_patient_prescriptions(headers, user)
         test_rewards_system(headers, user)
         

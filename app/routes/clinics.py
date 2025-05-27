@@ -190,7 +190,7 @@ async def update_clinic(
         "email": user.email,
         "services": clinic.services
     }
-    
+    #return the updated clinic data
     return clinic_data
 
 # Get clinic services
@@ -217,7 +217,7 @@ async def add_clinic_service(
     # Derive clinic_id from the authenticated user
     clinic_id_from_user = current_user.id
     
-    # Create service
+    # Create/package the service
     service = ClinicService(
         id=str(uuid.uuid4()),
         clinic_id=clinic_id_from_user, # Use derived clinic_id

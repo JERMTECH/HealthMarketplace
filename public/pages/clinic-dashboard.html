@@ -483,14 +483,13 @@
                     if (!user || user.type !== 'clinic') {
                         throw new Error('You must be logged in as a clinic to add services');
                     }
-                    
+                    // Build the service data payload for the backend
                     const serviceData = {
-                        clinicId: user.id,
                         name: nameInput.value.trim(),
                         description: descriptionInput.value.trim(),
-                        price: parseFloat(priceInput.value),
-                        duration: parseInt(durationInput.value),
-                        available: availableInput.checked
+                        price: priceInput.value.trim(), // send as string
+                        duration: durationInput.value.trim(), // send as string
+                        available: availableInput.checked ? "true" : "false" // send as string
                     };
                     
                     authorizedFetch('/api/clinics/services', {
@@ -541,6 +540,14 @@
             document.getElementById('services-tab').addEventListener('click', function() {
                 loadClinicServices();
             });
+            
+            // Load appointments when the appointments tab is clicked
+            document.getElementById('appointments-tab').addEventListener('click', loadClinicAppointments);
+
+            // Optionally, load appointments immediately if the appointments tab is already active on page load
+            if (document.getElementById('appointments-tab').classList.contains('active')) {
+               loadClinicAppointments();
+           }
             
             // Function to load clinic services
             function loadClinicServices() {

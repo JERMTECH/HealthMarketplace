@@ -147,7 +147,7 @@ async function loadClinicAppointments() {
         const user = getUser();
         
         if (!user || user.type !== 'clinic') {
-            window.location.href = '/pages/login.html';
+            window.location.href = '/pages/login.html'; // this is a redirect to login if not a clinic
             return;
         }
         
@@ -170,8 +170,16 @@ async function loadClinicAppointments() {
 function displayClinicAppointments(appointments) {
     const appointmentsContainer = document.getElementById('clinic-appointments');
     
-    if (!appointmentsContainer) return;
-    
+    //if no appointments container found, show error message on page
+    const errorContainer = document.getElementById('error-message');
+
+    if (!appointmentsContainer) {
+        console
+        //errorContainer.textContent = 'Failed to load appointments. Please try again later.';
+        //errorContainer.style.display = 'block';
+        return;
+    }
+
     // Clear container
     appointmentsContainer.innerHTML = '';
     
