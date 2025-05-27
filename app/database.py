@@ -11,17 +11,25 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Get database URL from environment variable
-DATABASE_URL = os.environ.get("DATABASE_URL", "")
+
+#setting the default to SQLite for local development
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./test.db")
 
 # Create SQLAlchemy engine with improved connection settings
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,  # Detect stale connections
-    pool_recycle=3600,   # Recycle connections every hour to avoid stale connections
-    pool_size=10,        # Increase connection pool size 
-    max_overflow=20,     # Allow up to 20 overflow connections
-    connect_args={"connect_timeout": 10}  # Timeout for new connections
-)
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
+else:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,  # Detect stale connections
+        pool_recycle=3600,   # Recycle connections every hour to avoid stale connections
+        pool_size=10,        # Increase connection pool size 
+        max_overflow=20,     # Allow up to 20 overflow connections
+        connect_args={"connect_timeout": 10}  # Timeout for new connections
+    )
 
 # Set up event listener for checkout to handle potential connection failures
 @event.listens_for(engine, "connect")

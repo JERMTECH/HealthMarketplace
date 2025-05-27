@@ -1,3 +1,7 @@
+// Manages admin reward configuration and actions for the frontend
+// Allows admins to view, add, edit, or delete reward configurations and view reward logs
+// ...existing code...
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize feather icons
     feather.replace();

@@ -1,3 +1,8 @@
+// Handles patient dashboard and profile logic for the frontend
+// Loads patient data, appointments, and allows profile updates
+// Manages order and prescription viewing and medication ordering
+// Displays patient rewards and points history
+
 // Patient-related functionality
 
 // Load patient profile

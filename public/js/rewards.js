@@ -1,3 +1,6 @@
+// Handles user rewards display and actions for the frontend
+// This file loads reward points, redemption options, and reward history for users
+
 // Rewards related functionality
 
 // Load rewards information

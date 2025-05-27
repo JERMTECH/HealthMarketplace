@@ -1,3 +1,6 @@
+// Controls the cart button UI for the frontend
+// Updates the cart icon/badge with the number of items, provides quick access to the cart
+
 // This script creates a fixed cart button that will be visible on all pages
 document.addEventListener('DOMContentLoaded', function() {
     // Create the cart button

@@ -1,3 +1,6 @@
+// Handles appointment booking and management for the frontend
+// Loads available appointments, allows users to book, cancel, or view appointment details
+
 // Appointments related functionality
 
 // Load available clinics for appointment booking

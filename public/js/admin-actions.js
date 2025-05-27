@@ -1,3 +1,6 @@
+// Handles admin-specific actions for the frontend
+// Manages admin operations such as approving clinics, managing users, or moderating content
+
 // Global admin dashboard action functions
 
 // Product actions

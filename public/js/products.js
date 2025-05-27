@@ -1,3 +1,6 @@
+// Handles product listing and details for the frontend
+// This file loads products, displays product details, and allows adding to cart
+
 // Products functionality
 
 document.addEventListener('DOMContentLoaded', function() {

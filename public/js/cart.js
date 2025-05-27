@@ -1,4 +1,5 @@
-// Cart functionality
+// Manages the shopping cart for the frontend
+// Adds/removes products, updates cart UI, handles checkout logic
 
 // Load cart contents
 function loadCartContents() {

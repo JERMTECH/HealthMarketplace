@@ -1,3 +1,6 @@
+// Manages payment processing UI and logic for the frontend
+// Handles payment forms, validation, and communicates with the backend for payment processing
+
 // Payment Processing Logic
 
 document.addEventListener('DOMContentLoaded', function() {

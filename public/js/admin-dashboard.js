@@ -1,3 +1,6 @@
+// Controls the admin dashboard UI for the frontend
+// Loads admin statistics, lists, and provides navigation or quick actions for admin users
+
 // Admin Dashboard JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2021,8 +2024,8 @@ function createClinicEditModal() {
     // Add event listener to save button
     modal.querySelector('#save-clinic-btn').addEventListener('click', function() {
         const form = document.getElementById('edit-clinic-form');
+        const id = document.getElementById('edit-clinic-id').value;
         if (form.checkValidity()) {
-            const id = document.getElementById('edit-clinic-id').value;
             const name = document.getElementById('edit-clinic-name').value;
             const specialization = document.getElementById('edit-clinic-specialization').value;
             const location = document.getElementById('edit-clinic-location').value;

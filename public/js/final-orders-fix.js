@@ -1,3 +1,6 @@
+// Patch or fix for order-related UI or logic in the frontend
+// Applies bug fixes or enhancements to the order process or order display
+
 // This is a special JavaScript file designed to fix the orders display once and for all
 // Add this script to the patient-dashboard.html page
 
